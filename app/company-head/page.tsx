@@ -114,7 +114,7 @@ export default function CompanyHeadDashboard() {
     };
 
     return (
-        <div className="min-h-screen relative overflow-x-hidden">
+        <div className="min-h-screen bg-black relative overflow-x-hidden">
             <StarField />
 
             <motion.div
@@ -130,13 +130,20 @@ export default function CompanyHeadDashboard() {
                             Welcome back, <span className="text-white font-semibold">{session?.user?.name || 'Chief'}</span>
                         </p>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-red-500/50 transition-all duration-300 text-gray-400 hover:text-red-400 group"
-                    >
-                        <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                        Sign Out
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <div className="glass rounded-xl px-4 py-2 hidden md:block">
+                            <p className="text-sm text-gray-400">
+                                <span className="text-accent-400 font-semibold">Company Head Access</span>
+                            </p>
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-red-500/50 transition-all duration-300 text-gray-400 hover:text-red-400 group"
+                        >
+                            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                            Sign Out
+                        </button>
+                    </div>
                 </motion.div>
 
                 {!kpiData || kpiData.overview.totalProjects === 0 ? (
@@ -230,6 +237,7 @@ export default function CompanyHeadDashboard() {
                                             <th className="text-left py-4 px-4">Client</th>
                                             <th className="text-right py-4 px-4">Quote Value</th>
                                             <th className="text-right py-4 px-4">Profit</th>
+                                            <th className="text-right py-4 px-4">Margin</th>
                                             <th className="text-center py-4 px-4">Status</th>
                                         </tr>
                                     </thead>
