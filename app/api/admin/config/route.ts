@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { PricingConfig, User } from '@/lib/models';
 import connectToDatabase from '@/lib/db';
 import { DEFAULT_CONFIG } from '@/lib/pricing-data';
