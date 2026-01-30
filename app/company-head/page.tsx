@@ -50,7 +50,7 @@ interface KPIData {
 }
 
 export default function CompanyHeadDashboard() {
-    const [kpiData, setKpiData] = useState<any>(null);
+    const [kpiData, setKpiData] = useState<KPIData | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedProject, setSelectedProject] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
