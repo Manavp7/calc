@@ -119,7 +119,7 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
             },
             phases: [],
         };
-        const costBreakdown = []; // Not used in current PDF export extensively, but required by type
+        const costBreakdown: Parameters<typeof generatePricingPDF>[3] = []; // Not used in current PDF export extensively, but required by type
 
         generatePricingPDF(inputs, clientPrice, timeline, costBreakdown);
     };
