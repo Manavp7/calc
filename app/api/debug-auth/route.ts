@@ -31,7 +31,13 @@ export async function GET() {
             isMatch,
             roles: user.role,
             passwordHashPrefix: user.password.substring(0, 10) + '...',
-            userId: user._id
+            userId: user._id,
+            envCheck: {
+                hasNextAuthSecret: !!process.env.NEXTAUTH_SECRET,
+                secretLength: process.env.NEXTAUTH_SECRET ? process.env.NEXTAUTH_SECRET.length : 0,
+                nextAuthUrl: process.env.NEXTAUTH_URL || 'Not Set (Vercel Default)',
+                nodeEnv: process.env.NODE_ENV
+            }
         });
     } catch (error: any) {
         return NextResponse.json({
