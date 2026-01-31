@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import dbConnect from '../lib/db';
+import { dbConnect } from '../lib/db';
 import { User, PricingConfig, TeamConfig } from '../lib/models';
 import { IDEA_COSTS, TECH_MULTIPLIERS, DELIVERY_MULTIPLIERS, SUPPORT_COSTS, HOURLY_RATES } from '../lib/constants';
 import { FEATURES_DATA } from '../lib/pricing-data';
