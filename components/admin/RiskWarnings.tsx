@@ -109,7 +109,7 @@ export default function RiskWarnings() {
             <h2 className="text-3xl font-bold mb-6">Risk Warnings</h2>
 
             <div className="space-y-4">
-                {riskWarnings.map((warning, index) => {
+                {riskWarnings.map((warning: any, index: number) => {
                     const colors = getSeverityColor(warning.severity);
 
                     return (
