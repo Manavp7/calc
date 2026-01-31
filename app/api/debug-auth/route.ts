@@ -22,6 +22,8 @@ export async function GET() {
             });
         }
 
+        const isMatch = await bcrypt.compare(passwordCandidate, user.password);
+
         const secret = process.env.NEXTAUTH_SECRET || '';
         const url = process.env.NEXTAUTH_URL || '';
 
