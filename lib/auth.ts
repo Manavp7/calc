@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
+import type { UserRole } from '@/types/next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db';
@@ -54,8 +55,8 @@ export const authOptions: NextAuthOptions = {
         },
         async session({ session, token }) {
             if (session.user) {
-                session.user.role = token.role as string;
-                session.user.id = token.id as string;
+                session.user.role = token.role;
+                session.user.id = token.id;
             }
             return session;
         },
@@ -78,22 +79,22 @@ export async function getCurrentUser() {
     return session?.user;
 }
 
-export function hasRole(userRole: string, allowedRoles: string[]) {
+export function hasRole(userRole: UserRole, allowedRoles: UserRole[]) {
     return allowedRoles.includes(userRole);
 }
 
-export function isAdmin(userRole: string) {
+export function isAdmin(userRole: UserRole) {
     return userRole === 'admin';
 }
 
-export function isCompanyHead(userRole: string) {
+export function isCompanyHead(userRole: UserRole) {
     return userRole === 'company_head';
 }
 
-export function canEditConfigs(userRole: string) {
+export function canEditConfigs(userRole: UserRole) {
     return userRole === 'admin';
 }
 
-export function canViewDashboard(userRole: string) {
+export function canViewDashboard(userRole: UserRole) {
     return ['admin', 'company_head'].includes(userRole);
 }

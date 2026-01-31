@@ -1,12 +1,14 @@
 import 'next-auth';
 
+export type UserRole = 'client' | 'admin' | 'company_head';
+
 declare module 'next-auth' {
     interface Session {
         user: {
             id: string;
             email: string;
             name: string;
-            role: 'client' | 'admin' | 'company_head';
+            role: UserRole;
         };
     }
 
@@ -14,13 +16,13 @@ declare module 'next-auth' {
         id: string;
         email: string;
         name: string;
-        role: 'client' | 'admin' | 'company_head';
+        role: UserRole;
     }
 }
 
 declare module 'next-auth/jwt' {
     interface JWT {
         id: string;
-        role: 'client' | 'admin' | 'company_head';
+        role: UserRole;
     }
 }
