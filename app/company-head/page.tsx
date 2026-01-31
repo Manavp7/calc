@@ -242,7 +242,7 @@ export default function CompanyHeadDashboard() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5">
-                                        {kpiData.projectMetrics.slice(0, 10).map((project: any, index: number) => (
+                                        {kpiData.projectMetrics.slice(0, 10).map((project: ProjectMetric, index: number) => (
                                             <motion.tr
                                                 key={project.id}
                                                 onClick={() => {
