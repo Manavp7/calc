@@ -63,7 +63,7 @@ Visit `http://localhost:3000` (or the port shown in terminal)
 
 ### Admin Access
 - URL: `/admin/pricing-analysis`
-- Password: `pricing2024`
+- Password: `pricing2026`
 
 ## 📁 Project Structure
 
