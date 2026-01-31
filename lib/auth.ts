@@ -78,6 +78,7 @@ export const authOptions: NextAuthOptions = {
     },
     pages: {
         signIn: '/company-head/login',
+        error: '/company-head/login', // Redirect errors back to login page
     },
     session: {
         strategy: 'jwt',
