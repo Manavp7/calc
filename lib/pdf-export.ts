@@ -234,11 +234,11 @@ export function generatePricingPDF(
     };
 
     const details = [
-        ['Idea Type', formatValue(inputs.ideaType)],
-        ['Product Format', formatValue(inputs.productFormat)],
-        ['Technology Stack', formatValue(inputs.techStack)],
-        ['Delivery Speed', formatValue(inputs.deliverySpeed)],
-        ['Support Duration', formatValue(inputs.supportDuration)],
+        ['Idea Type', formatValue(inputs.ideaType ?? undefined)],
+        ['Product Format', formatValue(inputs.productFormat ?? undefined)],
+        ['Technology Stack', formatValue(inputs.techStack ?? undefined)],
+        ['Delivery Speed', formatValue(inputs.deliverySpeed ?? undefined)],
+        ['Support Duration', formatValue(inputs.supportDuration ?? undefined)],
         ['Features Selected', inputs.selectedFeatures.length.toString()]
     ];
 
