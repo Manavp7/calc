@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
+import { dbConnect } from '@/lib/db';
 import { Project } from '@/lib/models';
 
 // GET - Fetch KPIs for company head dashboard

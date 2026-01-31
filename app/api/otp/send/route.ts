@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { OTP } from '@/lib/models/otp';
-import dbConnect from '@/lib/db';
+import { dbConnect } from '@/lib/db';
 import nodemailer from 'nodemailer';
 
 export async function POST(req: Request) {

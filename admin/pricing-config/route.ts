@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/db';
+import { dbConnect } from '@/lib/db';
 import { PricingConfig } from '@/lib/models';
 import { getCurrentUser } from '@/lib/auth';
 
