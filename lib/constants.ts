@@ -272,6 +272,19 @@ export const IDEA_COSTS: Record<IdeaType, number> = {
     'ai-powered-product': 80000,
 };
 
+export const TECH_MULTIPLIERS: Record<string, number> = {
+    'react-nextjs': 1.0,
+    'react-native': 1.2,
+    'flutter': 1.2,
+    'expert-choice': 1.0,
+    'vue-nuxt': 1.1,
+    'angular': 1.1,
+    'nodejs': 1.0,
+    'python-django': 1.3,
+    'native-ios': 1.5,
+    'native-android': 1.5
+};
+
 export const DELIVERY_MULTIPLIERS: Record<DeliverySpeed, number> = {
     'standard': 1.0,
     'faster': 1.3,
