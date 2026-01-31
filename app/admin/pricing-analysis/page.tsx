@@ -9,10 +9,22 @@ import ProfitAnalysis from '@/components/admin/ProfitAnalysis';
 import RiskWarnings from '@/components/admin/RiskWarnings';
 import { motion } from 'framer-motion';
 
+interface AnalysisProject {
+    _id: string;
+    clientName: string;
+    profitAnalysis: {
+        profitMargin: number;
+        healthStatus: string;
+        clientPrice: number;
+        internalCost: number;
+        profit: number;
+    };
+}
+
 export default function AdminPricingAnalysis() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const { clientPrice, internalCost, profitAnalysis, inputs } = usePricingStore();
-    const [projects, setProjects] = useState<any[]>([]);
+    const [projects, setProjects] = useState<AnalysisProject[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
     const [loadingProjects, setLoadingProjects] = useState(false);
     const [loadingDetails, setLoadingDetails] = useState(false);
@@ -107,16 +119,16 @@ export default function AdminPricingAnalysis() {
                                         key={project._id}
                                         onClick={() => handleProjectSelect(project._id)}
                                         className={`w-full text-left p-4 rounded-xl transition-all ${selectedProjectId === project._id
-                                                ? 'bg-primary-500/20 border border-primary-500/50 text-white'
-                                                : 'bg-white/5 border border-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                                            ? 'bg-primary-500/20 border border-primary-500/50 text-white'
+                                            : 'bg-white/5 border border-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                                             }`}
                                     >
                                         <p className="font-semibold truncate">{project.clientName || 'Anonymous'}</p>
                                         <div className="flex justify-between items-center mt-2 text-xs">
                                             <span>{(project.profitAnalysis.profitMargin).toFixed(0)}% Margin</span>
                                             <span className={`px-2 py-0.5 rounded-full ${project.profitAnalysis.healthStatus === 'healthy' ? 'bg-green-500/20 text-green-400' :
-                                                    project.profitAnalysis.healthStatus === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                        'bg-red-500/20 text-red-400'
+                                                project.profitAnalysis.healthStatus === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                    'bg-red-500/20 text-red-400'
                                                 }`}>
                                                 {project.profitAnalysis.healthStatus}
                                             </span>

@@ -6,8 +6,22 @@ import { ArrowLeft, Search, Database, Calendar, DollarSign, User } from 'lucide-
 import Link from 'next/link';
 import StarField from '@/components/three/StarField';
 
+interface Project {
+    _id: string;
+    clientName: string;
+    email: string;
+    createdAt: string;
+    inputs: {
+        ideaType: string;
+        productFormat: string;
+    };
+    profitAnalysis: {
+        clientPrice: number;
+    };
+}
+
 export default function AdminDatabasePage() {
-    const [projects, setProjects] = useState<any[]>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -119,8 +133,8 @@ export default function AdminDatabasePage() {
                                             </td>
                                             <td className="p-4">
                                                 <span className={`px-2 py-1 rounded text-xs border ${project.inputs?.productFormat === 'mobile-app' ? 'border-purple-500/30 text-purple-400 bg-purple-500/10' :
-                                                        project.inputs?.productFormat === 'website' ? 'border-blue-500/30 text-blue-400 bg-blue-500/10' :
-                                                            'border-green-500/30 text-green-400 bg-green-500/10'
+                                                    project.inputs?.productFormat === 'website' ? 'border-blue-500/30 text-blue-400 bg-blue-500/10' :
+                                                        'border-green-500/30 text-green-400 bg-green-500/10'
                                                     }`}>
                                                     {project.inputs?.productFormat?.replace(/-/g, ' ') || 'Website'}
                                                 </span>

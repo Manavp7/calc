@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
-import * as random from 'three/examples/jsm/utils/BufferGeometryUtils';
+
 // Note: We'll generate random positions manually to avoid dependency issues with BufferGeometryUtils in some setups,
 // or use a simple generator function.
 
