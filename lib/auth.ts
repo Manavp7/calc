@@ -83,6 +83,8 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
     },
     secret: process.env.NEXTAUTH_SECRET,
+    // Fix for Vercel deployments where NEXTAUTH_URL might not be set
+    trustHost: true,
 };
 
 export async function getSession() {
