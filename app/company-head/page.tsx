@@ -207,7 +207,7 @@ export default function CompanyHeadDashboard() {
                                 </h3>
                                 {kpiData.riskWarnings.length > 0 ? (
                                     <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {kpiData.riskWarnings.map((warning) => (
+                                        {kpiData.riskWarnings.map((warning: RiskWarning) => (
                                             <div key={warning.projectId} className={`p-4 rounded-xl border transition-all hover:scale-[1.02] ${warning.healthStatus === 'critical' ? 'bg-red-500/10 border-red-500/20' : 'bg-yellow-500/10 border-yellow-500/20'}`}>
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="font-semibold text-white truncate max-w-[120px]">{warning.clientName}</span>
