@@ -1,52 +1,36 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/pricing-calculator';
+const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
-    throw new Error('Please define the MONGODB_URI environment variable');
+    throw new Error("Please define the MONGODB_URI environment variable");
 }
 
-/**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections growing exponentially
- * during API Route usage.
- */
-declare global {
-    var mongoose: {
-        conn: typeof mongoose | null;
-        promise: Promise<typeof mongoose> | null;
+interface MongooseCache {
+    conn: typeof mongoose | null;
+    promise: Promise<typeof mongoose> | null;
+}
+
+let cached: MongooseCache = (global as any).mongoose;
+
+if (!cached) {
+    cached = (global as any).mongoose = {
+        conn: null,
+        promise: null,
     };
 }
 
-let cached = global.mongoose;
-
-if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null };
-}
-
-async function dbConnect() {
+export async function dbConnect(): Promise<typeof mongoose> {
     if (cached.conn) {
         return cached.conn;
     }
 
     if (!cached.promise) {
-        const opts = {
+        cached.promise = mongoose.connect(MONGODB_URI, {
             bufferCommands: false,
-        };
-
-        cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-            return mongoose;
         });
     }
 
-    try {
-        cached.conn = await cached.promise;
-    } catch (e) {
-        cached.promise = null;
-        throw e;
-    }
-
+    cached.conn = await cached.promise;
     return cached.conn;
 }
-
-export default dbConnect;
