@@ -402,7 +402,7 @@ export const getRiskBuffer = (featureCount: number, hasAI: boolean): number => {
 };
 
 import { PricingConfiguration } from './types';
-import { DELIVERY_MULTIPLIERS, SUPPORT_COSTS, DEFAULT_CLIENT_HOURLY_RATE, SUPPORT_HOURS } from './constants';
+import { DELIVERY_MULTIPLIERS, SUPPORT_COSTS, DEFAULT_CLIENT_HOURLY_RATE, SUPPORT_HOURS, HOURLY_RATES } from './constants';
 
 export const DEFAULT_CONFIG: PricingConfiguration = {
     baseIdeaHours: BASE_IDEA_HOURS,
@@ -416,11 +416,5 @@ export const DEFAULT_CONFIG: PricingConfiguration = {
     featureCosts: {}, // Empty by default, falling back to featureBaseCost
     clientHourlyRate: DEFAULT_CLIENT_HOURLY_RATE,
     supportHours: SUPPORT_HOURS,
-    hourlyRates: {
-        frontend: 85,
-        backend: 95,
-        designer: 75,
-        qa: 65,
-        pm: 100,
-    },
+    hourlyRates: HOURLY_RATES,
 };
