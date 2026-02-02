@@ -30,6 +30,23 @@ export function generatePricingPDF(
     doc.setFont('helvetica', 'normal');
     doc.text(new Date().toLocaleDateString(), 105, 33, { align: 'center' });
 
+    // Client Details (Sub-header)
+    doc.setFontSize(10);
+    doc.setTextColor(200, 200, 200); // Light gray for details on dark background
+
+    let subHeaderY = 38;
+    const clientInfo = [
+        inputs.clientName || 'Valued Client',
+        inputs.companyName,
+        inputs.email,
+        inputs.phone
+    ].filter(Boolean).join(' • '); // Separator dot
+
+    // Check if text fits or needs wrapping (simple check)
+    if (clientInfo.length > 0) {
+        doc.text(clientInfo, 105, 38, { align: 'center' });
+    }
+
     yPos = 55;
 
     // Main Price Section

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, TrendingUp, DollarSign, Users, Calendar, Mail, Phone, Building, Layers } from 'lucide-react';
 import { generatePricingPDF } from '@/lib/pdf-export';
 import { useEffect, useState } from 'react';
-import { calculateInternalCost, calculateProfit } from '@/lib/pricing-engine';
+import { calculateInternalCost, calculateProfit, calculateTimeline } from '@/lib/pricing-engine';
 import GanttChart from '@/components/client/GanttChart';
 import { Timeline } from '@/lib/types';
 
@@ -111,14 +111,29 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
             timelineMultiplier: 1,
             supportCost: 0,
         };
-        const timeline = timelineData || {
-            totalWeeks: fullProject.clientPrice.timeline,
-            teamSize: {
-                min: fullProject.clientPrice.teamSizeMin,
-                max: fullProject.clientPrice.teamSizeMax,
-            },
-            phases: [],
-        };
+
+        // Recalculate timeline to ensure consistency with the latest engine logic
+        // This fixes the "3 weeks vs 6 weeks" discrepancy for older saved projects
+        let timeline: Timeline | null = timelineData;
+        try {
+            // We use the displayCost which is already verified/recalculated if needed
+            timeline = calculateTimeline(inputs, displayCost);
+        } catch (e) {
+            console.warn("Could not recalculate timeline for PDF, falling back to stored data", e);
+        }
+
+        // Final fallback if both recalculation fails AND timelineData was null
+        if (!timeline) {
+            timeline = {
+                totalWeeks: fullProject.clientPrice.timeline || 0,
+                teamSize: {
+                    min: fullProject.clientPrice.teamSizeMin || 1,
+                    max: fullProject.clientPrice.teamSizeMax || 1,
+                },
+                phases: [],
+            };
+        }
+
         const costBreakdown: Parameters<typeof generatePricingPDF>[3] = []; // Not used in current PDF export extensively, but required by type
 
         generatePricingPDF(inputs, clientPrice, timeline, costBreakdown);
