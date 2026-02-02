@@ -68,6 +68,7 @@ interface PricingState {
     setAIAnalysis: (analysis: AIAnalysis) => void;
     populateFromAI: (analysis: AIAnalysis) => void;
     setLeadInfo: (info: { clientName: string; companyName: string; email: string; phone: string }) => void;
+    analyzeProjectComplexity: () => Promise<void>;
 }
 
 const initialInputs: PricingInputs = {
@@ -236,5 +237,46 @@ export const usePricingStore = create<PricingState>((set, get) => ({
                 ...info,
             },
         }));
+    },
+
+    analyzeProjectComplexity: async () => {
+        const { inputs } = get();
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'}/api/ai/analyze-complexity`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    projectDescription: inputs.projectDescription,
+                    features: inputs.selectedFeatures,
+                    ideaType: inputs.ideaType,
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('AI Complexity Analysis:', data);
+
+                // Update store with AI findings
+                set((state) => ({
+                    inputs: {
+                        ...state.inputs,
+                        complexityLevel: data.complexityLevel,
+                    },
+                    riskWarnings: [
+                        ...state.riskWarnings,
+                        ...(data.technical_risks || []).map((risk: string) => ({
+                            type: 'complexity',
+                            severity: 'medium',
+                            message: risk
+                        }))
+                    ]
+                }));
+
+                // Recalculate with new complexity
+                get().calculateResults();
+            }
+        } catch (error) {
+            console.error('Failed to analyze complexity:', error);
+        }
     },
 }));
