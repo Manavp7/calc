@@ -103,6 +103,9 @@ export interface ClientPrice {
         min: number;
         max: number;
     };
+    totalDevHours?: number; // Added for hourly breakdown
+    totalSupportHours?: number; // Added for hourly breakdown
+    hourlyRate?: number; // Added for hourly breakdown
 }
 
 export interface ProfitAnalysis {

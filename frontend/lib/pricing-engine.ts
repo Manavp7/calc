@@ -248,6 +248,9 @@ export function calculateClientPrice(inputs: PricingInputs, config: PricingConfi
         supportCost,
         totalPrice,
         priceRange,
+        totalDevHours: Math.round(adjustedDevHours),
+        totalSupportHours: Math.round(totalSupportHours),
+        hourlyRate,
     };
 }
 
