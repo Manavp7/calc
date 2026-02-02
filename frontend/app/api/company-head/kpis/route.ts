@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { calculateInternalCost, calculateClientPrice, calculateProfit } from '@/lib/pricing-engine';
+import { dbConnect } from '@/lib/db';
+import { User } from '@/lib/models';
 
 // GET - Fetch KPIs for company head dashboard
 // We recalculate these on-the-fly to ensure latest pricing formulas are applied to all stored projects
@@ -7,17 +9,28 @@ export async function GET() {
     try {
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
-        // Fetch all raw projects instead of pre-calculated KPIs
+        // 1. Fetch all raw projects from backend provided API
         const res = await fetch(`${backendUrl}/api/projects`, { cache: 'no-store' });
 
-        if (!res.ok) {
-            throw new Error('Failed to fetch projects from backend');
+        let projects = [];
+        if (res.ok) {
+            const data = await res.json();
+            projects = data.projects || [];
+        } else {
+            console.error('Failed to fetch projects from backend');
         }
 
-        const data = await res.json();
-        const projects = data.projects || [];
+        // 2. Fetch Active Users Count directly from DB (since backend KPI doesn't include it yet)
+        let activeUsers = 0;
+        try {
+            await dbConnect();
+            activeUsers = await User.countDocuments();
+        } catch (dbError) {
+            console.error('Error counting users:', dbError);
+            // Fallback to 0 if db connection fails
+        }
 
-        // Recalculate KPIs using current engine logic
+        // 3. Recalculate KPIs using current engine logic
         const recalculatedProjects = projects.map((p: any) => {
             // Recalculate based on stored inputs
             // Handle legacy projects or missing inputs gracefully
@@ -91,6 +104,7 @@ export async function GET() {
                 totalProfit,
                 averageProfitMargin,
                 totalProjects: recalculatedProjects.length,
+                activeUsers, // Added real users count
             },
             projectMetrics,
             healthDistribution,

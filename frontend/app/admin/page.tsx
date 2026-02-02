@@ -152,7 +152,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="text-center">
                             <p className="text-4xl font-bold gradient-text mb-2">
-                                {loading ? '-' : '24'} {/* Hardcoded for now as user data isn't in KPIs yet */}
+                                {loading ? '-' : kpiData?.overview?.activeUsers || 0}
                             </p>
                             <p className="text-gray-400 text-sm">Active Users</p>
                         </div>
