@@ -51,13 +51,14 @@ export default function SupportMaintenance() {
                                 {pkg.description}
                             </p>
 
-                            <div className="text-primary-400 font-bold text-lg">
-                                {pkg.monthlyHours} hrs/mo
-                            </div>
+                            {pkg.monthlyHours > 0 ? (
+                                <div className="text-primary-400 font-bold text-lg">
+                                    {pkg.monthlyHours} hrs/mo
+                                </div>
                             ) : (
-                            <div className="text-gray-500 font-medium text-lg">
-                                0 hrs
-                            </div>
+                                <div className="text-gray-500 font-medium text-lg">
+                                    0 hrs
+                                </div>
                             )}
 
                             {inputs.supportDuration === pkg.id && (
