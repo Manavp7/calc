@@ -189,21 +189,18 @@ export const SUPPORT_PACKAGES = [
         id: '3-months' as SupportDuration,
         title: '3 Months',
         description: 'Quarterly support',
-        monthlyCost: 2000,
         monthlyHours: 15,
     },
     {
         id: '6-months' as SupportDuration,
         title: '6 Months',
         description: 'Bi-annual support',
-        monthlyCost: 1800,
         monthlyHours: 20,
     },
     {
         id: '12-months' as SupportDuration,
         title: '12 Months',
         description: 'Annual support',
-        monthlyCost: 1500,
         monthlyHours: 25,
     },
 ];
