@@ -161,31 +161,27 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                         Project Details
                                     </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
+                                        <div className="space-y-4">
                                             <div className="flex items-center gap-2 text-gray-400">
-                                                <Users className="w-4 h-4 text-primary-400" />
-                                                <span className="font-medium text-white">{fullProject.inputs?.clientName || project.clientName || 'Anonymous'}</span>
+                                                <Users className="w-4 h-4 text-primary-400 shrink-0" />
+                                                <span className="font-medium text-white">{fullProject.inputs?.clientName || project.clientName || 'Anonymous Client'}</span>
                                             </div>
-                                            {fullProject.inputs?.companyName && (
-                                                <div className="flex items-center gap-2 text-gray-400">
-                                                    <Building className="w-4 h-4 text-primary-400" />
-                                                    <span>{fullProject.inputs.companyName}</span>
-                                                </div>
-                                            )}
+
+                                            <div className="flex items-center gap-2 text-gray-400">
+                                                <Building className="w-4 h-4 text-primary-400 shrink-0" />
+                                                <span>{fullProject.inputs?.companyName || 'No Company Name'}</span>
+                                            </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            {fullProject.inputs?.email && (
-                                                <div className="flex items-center gap-2 text-gray-400">
-                                                    <Mail className="w-4 h-4 text-primary-400" />
-                                                    <span>{fullProject.inputs.email}</span>
-                                                </div>
-                                            )}
-                                            {fullProject.inputs?.phone && (
-                                                <div className="flex items-center gap-2 text-gray-400">
-                                                    <Phone className="w-4 h-4 text-primary-400" />
-                                                    <span>{fullProject.inputs.phone}</span>
-                                                </div>
-                                            )}
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2 text-gray-400">
+                                                <Mail className="w-4 h-4 text-primary-400 shrink-0" />
+                                                <span>{fullProject.inputs?.email || 'No Email Provided'}</span>
+                                            </div>
+
+                                            <div className="flex items-center gap-2 text-gray-400">
+                                                <Phone className="w-4 h-4 text-primary-400 shrink-0" />
+                                                <span>{fullProject.inputs?.phone || 'No Phone Provided'}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -300,27 +296,27 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                 <div className="glass rounded-2xl p-6">
                                     <h3 className="text-xl font-bold mb-4">Profit Analysis</h3>
                                     <div className="h-full flex flex-col justify-between py-2">
-                                        <div className="text-center p-4 rounded-xl bg-white/5 flex-grow flex flex-col justify-center">
-                                            <p className="text-sm text-gray-400 mb-2">Net Profit</p>
-                                            <p className="text-3xl font-bold text-accent-400 mb-2">
+                                        <div className="text-center p-4 rounded-xl bg-white/5 flex-grow mb-4 flex flex-col justify-center">
+                                            <p className="text-sm text-gray-400 mb-1">Net Profit</p>
+                                            <p className="text-3xl font-bold text-accent-400 mb-1">
                                                 ${displayProfit.profit.toLocaleString()}
                                             </p>
                                             <p className="text-xs text-gray-500">After all expenses</p>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4 mt-4">
-                                            <div className="text-center p-4 rounded-xl bg-white/5">
-                                                <p className="text-sm text-gray-400 mb-2">Margin</p>
-                                                <p className={`text-2xl font-bold ${displayProfit.healthStatus === 'healthy' ? 'text-green-400' :
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="text-center p-3 rounded-xl bg-white/5">
+                                                <p className="text-xs text-gray-400 mb-1">Margin</p>
+                                                <p className={`text-xl font-bold ${displayProfit.healthStatus === 'healthy' ? 'text-green-400' :
                                                     displayProfit.healthStatus === 'warning' ? 'text-yellow-400' :
                                                         'text-red-400'
                                                     }`}>
                                                     {displayProfit.profitMargin.toFixed(1)}%
                                                 </p>
                                             </div>
-                                            <div className="text-center p-4 rounded-xl bg-white/5">
-                                                <p className="text-sm text-gray-400 mb-2">Health</p>
-                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${displayProfit.healthStatus === 'healthy' ? 'bg-green-500/20 text-green-400 border border-green-500/20' :
+                                            <div className="text-center p-3 rounded-xl bg-white/5">
+                                                <p className="text-xs text-gray-400 mb-1">Health</p>
+                                                <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${displayProfit.healthStatus === 'healthy' ? 'bg-green-500/20 text-green-400 border border-green-500/20' :
                                                     displayProfit.healthStatus === 'warning' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20' :
                                                         'bg-red-500/0 text-red-400 border border-red-500/20'
                                                     }`}>
