@@ -181,7 +181,7 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
             health: displayProfit.healthStatus
         } : undefined;
 
-        const laborData = viewMode === 'admin' ? displayCost.laborCosts.map(l => ({
+        const laborData = viewMode === 'admin' ? displayCost.laborCosts.map((l: RoleCost) => ({
             role: l.role,
             hours: l.hours,
             rate: l.hourlyRate,
