@@ -72,8 +72,8 @@ export default function AdminAuth({ onAuthenticated }: { onAuthenticated: () => 
                 </form>
 
                 <div className="mt-6 text-center">
-                    <a href="/" className="text-gray-400 hover:text-primary-400 transition-colors text-sm">
-                        ← Back to Calculator
+                    <a href="/admin" className="text-gray-400 hover:text-primary-400 transition-colors text-sm">
+                        ← Back to Admin Dashboard
                     </a>
                 </div>
 

@@ -156,10 +156,10 @@ export default function AdminPricingAnalysis() {
                                         Internal Pricing Analysis
                                     </h1>
                                     <a
-                                        href="/"
+                                        href="/admin"
                                         className="btn-secondary text-sm px-6 py-3"
                                     >
-                                        ← Back to Calculator
+                                        ← Back to Admin Dashboard
                                     </a>
                                 </div>
                                 <p className="text-gray-400 text-lg">
