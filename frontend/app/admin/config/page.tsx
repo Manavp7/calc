@@ -399,15 +399,55 @@ export default function AdminConfigPage() {
                         </div>
                     </motion.section>
 
+                    {/* Client Pricing Section */}
+                    <motion.section
+                        className="glass p-6 rounded-2xl"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15 }}
+                    >
+                        <h2 className="text-xl font-semibold mb-4 text-sky-400 border-b border-white/10 pb-2">Client Pricing</h2>
+                        <div className="space-y-6">
+                            <div className="flex justify-between items-center">
+                                <label className="text-gray-300 font-medium">Client Hourly Rate (USD/hr)</label>
+                                <input
+                                    type="number"
+                                    value={config.clientHourlyRate ?? 120}
+                                    onChange={(e) => updateClientHourlyRate(e.target.value)}
+                                    className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-32 text-right focus:border-sky-500 focus:outline-none transition-colors"
+                                />
+                            </div>
 
-                    {/* Timeline & Support */}
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500 mb-3">Support Hours (Monthly)</h3>
+                                <div className="space-y-3">
+                                    {config.supportHours && Object.entries(config.supportHours).map(([key, value]) => (
+                                        <div key={key} className="flex justify-between items-center">
+                                            <label className="text-gray-300 capitalize">{key.replace(/-/g, ' ')}</label>
+                                            <input
+                                                type="number"
+                                                value={value}
+                                                onChange={(e) => updateSupportHours(key, e.target.value)}
+                                                className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-32 text-right focus:border-sky-500 focus:outline-none transition-colors"
+                                            />
+                                        </div>
+                                    ))}
+                                    {!config.supportHours && (
+                                        <p className="text-gray-500 text-sm italic">Save to initialize support hours.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </motion.section>
+
+                    {/* Timeline & Delivery */}
                     <motion.section
                         className="glass p-6 rounded-2xl"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                     >
-                        <h2 className="text-xl font-semibold mb-4 text-emerald-400 border-b border-white/10 pb-2">Timeline & Support</h2>
+                        <h2 className="text-xl font-semibold mb-4 text-emerald-400 border-b border-white/10 pb-2">Timeline Settings</h2>
                         <div className="space-y-6">
                             <div>
                                 <h3 className="text-sm font-medium text-gray-500 mb-3">Delivery Speed Multipliers</h3>
@@ -421,23 +461,6 @@ export default function AdminConfigPage() {
                                                 value={value}
                                                 onChange={(e) => updateTimelineMultiplier(key, e.target.value)}
                                                 className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-24 text-right focus:border-emerald-500 focus:outline-none transition-colors"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-sm font-medium text-gray-500 mb-3">Support Packages (Total Cost USD)</h3>
-                                <div className="space-y-3">
-                                    {Object.entries(config.supportPackages).map(([key, value]) => (
-                                        <div key={key} className="flex justify-between items-center">
-                                            <label className="text-gray-300 capitalize">{key.replace(/-/g, ' ')}</label>
-                                            <input
-                                                type="number"
-                                                value={value}
-                                                onChange={(e) => updateSupportPackage(key, e.target.value)}
-                                                className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-32 text-right focus:border-emerald-500 focus:outline-none transition-colors"
                                             />
                                         </div>
                                     ))}
