@@ -34,7 +34,7 @@ export const IDEA_TYPES = [
     },
     {
         id: 'ai-powered-product' as IdeaType,
-        title: 'AI-Powered Product',
+        title: 'AI Powered Product',
         description: 'Intelligent application with AI',
         icon: '🤖',
     },
@@ -45,7 +45,7 @@ export const PRODUCT_FORMATS = [
     {
         id: 'website' as ProductFormat,
         title: 'Website',
-        description: 'Web-based application',
+        description: 'Web based application',
     },
     {
         id: 'mobile-app' as ProductFormat,
@@ -74,7 +74,7 @@ export const TECH_STACKS = [
     {
         id: 'react-native' as TechStack,
         title: 'React Native',
-        description: 'Cross-platform mobile',
+        description: 'Cross platform mobile',
     },
     {
         id: 'flutter' as TechStack,
@@ -140,7 +140,7 @@ export const FEATURE_GROUPS = {
         title: 'Growth & Engagement',
         features: [
             { id: 'notifications', name: 'Notifications', description: 'Push & email alerts' },
-            { id: 'chat', name: 'Chat', description: 'Real-time messaging' },
+            { id: 'chat', name: 'Chat', description: 'Real time messaging' },
             { id: 'ai-recommendations', name: 'AI Recommendations', description: 'Personalized suggestions' },
         ],
     },
@@ -148,7 +148,7 @@ export const FEATURE_GROUPS = {
         title: 'Trust & Safety',
         features: [
             { id: 'admin-control', name: 'Admin Control', description: 'Manage your platform' },
-            { id: 'data-security', name: 'Data Security', description: 'Enterprise-grade security' },
+            { id: 'data-security', name: 'Data Security', description: 'Enterprise grade security' },
             { id: 'backups', name: 'Backups', description: 'Automated data backups' },
         ],
     },
@@ -194,7 +194,7 @@ export const SUPPORT_PACKAGES = [
     {
         id: '6-months' as SupportDuration,
         title: '6 Months',
-        description: 'Bi-annual support',
+        description: 'Semiannual support',
         monthlyHours: 20,
     },
     {

@@ -20,7 +20,7 @@ export default function SupportMaintenance() {
                         Support & Maintenance
                     </h2>
                     <p className="text-gray-400 text-center mb-12 text-lg">
-                        Choose your post-launch support duration
+                        Choose your post launch support duration
                     </p>
                 </motion.div>
 
