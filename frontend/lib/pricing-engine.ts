@@ -100,6 +100,9 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
         complexityMultiplier = Math.max(complexityMultiplier, levelMultiplier);
     }
 
+    // Apply tech stack multiplier to hours (harder tech = more time)
+    const techMultiplier = inputs.techStack ? config.techMultipliers[inputs.techStack] : 1.0;
+
     // Determine multipliers
     // "if more hard number of people working can be increased" -> Scale Hours
     const hoursComplexityMultiplier = complexityMultiplier;
@@ -116,31 +119,31 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
     const laborCosts: RoleCost[] = [
         {
             role: 'frontend',
-            hours: Math.round(totalHours.frontend * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hours: Math.round(totalHours.frontend * formatMultiplier * techMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
             hourlyRate: Math.round(rates.frontend * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'backend',
-            hours: Math.round(totalHours.backend * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hours: Math.round(totalHours.backend * formatMultiplier * techMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
             hourlyRate: Math.round(rates.backend * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'designer',
-            hours: Math.round(totalHours.designer * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hours: Math.round(totalHours.designer * formatMultiplier * techMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
             hourlyRate: Math.round(rates.designer * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'qa',
-            hours: Math.round(totalHours.qa * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hours: Math.round(totalHours.qa * formatMultiplier * techMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
             hourlyRate: Math.round(rates.qa * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'pm',
-            hours: Math.round(totalHours.pm * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hours: Math.round(totalHours.pm * formatMultiplier * techMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
             hourlyRate: Math.round(rates.pm * rateComplexityMultiplier),
             totalCost: 0,
         },
@@ -226,6 +229,11 @@ export function calculateClientPrice(inputs: PricingInputs, config: PricingConfi
     const featureHoursTotal = Object.values(featureHoursObj).reduce((sum, h) => sum + h, 0);
 
     // 3. Multipliers
+    // Format multiplier
+    const formatMultiplier = inputs.productFormat
+        ? config.formatMultipliers[inputs.productFormat]
+        : 1.0;
+
     // Tech multiplier
     const techMultiplier = inputs.techStack
         ? config.techMultipliers[inputs.techStack]
@@ -243,7 +251,7 @@ export function calculateClientPrice(inputs: PricingInputs, config: PricingConfi
 
     // 4. Calculate Adjusted Development Hours
     // We apply multipliers to the hours to reflect the increased effort/value
-    const adjustedDevHours = (baseHoursTotal + featureHoursTotal) * techMultiplier * complexityMultiplier * timelineMultiplier;
+    const adjustedDevHours = (baseHoursTotal + featureHoursTotal) * formatMultiplier * techMultiplier * complexityMultiplier * timelineMultiplier;
 
     // 5. Calculate Development Cost
     // Use configured client hourly rate or default
