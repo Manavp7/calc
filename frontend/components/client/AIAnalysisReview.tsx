@@ -261,7 +261,7 @@ export default function AIAnalysisReview({ analysis, onConfirm, onEdit }: AIAnal
                             onClick={() => onConfirm(editedAnalysis)}
                             className="btn-primary px-8 py-4 text-lg flex items-center gap-2"
                         >
-                            <Sparkles className="w-5 h-5" />
+
                             Looks Good - Show Full Breakdown
                             <ArrowRight className="w-5 h-5" />
                         </button>
