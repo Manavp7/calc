@@ -67,7 +67,20 @@ export default function AdminPricingAnalysis() {
                         // Fallback if details aren't stored exactly matching type
                         totalPrice: projectData.profitAnalysis.clientPrice
                     },
-                    internalCost: projectData.profitAnalysis.internalCostDetails || {
+                    // Populate cost breakdown correctly
+                    internalCost: projectData.internalCost ? {
+                        laborCosts: projectData.internalCost.laborCosts || [],
+                        totalLaborCost: projectData.internalCost.totalLaborCost || 0,
+                        infrastructureCost: projectData.internalCost.infrastructureCost || 0,
+                        overheadCost: projectData.internalCost.overheadCost || 0,
+                        riskBuffer: projectData.internalCost.riskBuffer || 0,
+                        totalInternalCost: projectData.internalCost.totalCost || projectData.profitAnalysis.internalCost
+                    } : {
+                        laborCosts: [],
+                        totalLaborCost: 0,
+                        infrastructureCost: 0,
+                        overheadCost: 0,
+                        riskBuffer: 0,
                         totalInternalCost: projectData.profitAnalysis.internalCost
                     },
                     profitAnalysis: {
