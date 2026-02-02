@@ -405,7 +405,7 @@ import { PricingConfiguration } from './types';
 import { DELIVERY_MULTIPLIERS, SUPPORT_COSTS, DEFAULT_CLIENT_HOURLY_RATE, SUPPORT_HOURS } from './constants';
 
 export const DEFAULT_CONFIG: PricingConfiguration = {
-    baseIdeaCosts: BASE_IDEA_COSTS,
+    baseIdeaHours: BASE_IDEA_HOURS,
     techMultipliers: TECH_MULTIPLIERS,
     formatMultipliers: FORMAT_MULTIPLIERS,
     timelineMultipliers: DELIVERY_MULTIPLIERS,

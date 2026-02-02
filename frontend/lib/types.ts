@@ -142,22 +142,30 @@ export interface RiskWarning {
     message: string;
 }
 
+export interface RoleHours {
+    frontend: number;
+    backend: number;
+    designer: number;
+    qa: number;
+    pm: number;
+}
+
 export interface PricingConfiguration {
-    baseIdeaCosts: Record<IdeaType, number>;
+    baseIdeaHours: Record<IdeaType, RoleHours>;
     techMultipliers: Record<TechStack, number>;
-    formatMultipliers: Record<ProductFormat, number>; // Added this as it is used in calculations
+    formatMultipliers: Record<ProductFormat, number>;
     timelineMultipliers: Record<DeliverySpeed, number>;
     complexityMultipliers: {
         basic: number;
         medium: number;
         advanced: number;
     };
-    infrastructureCosts: Record<IdeaType, number>; // Added missing property
+    infrastructureCosts: Record<IdeaType, number>;
     supportPackages: Record<SupportDuration, number>;
-    featureBaseCost: number; // Fallback cost per feature if specific cost not found
-    featureCosts: Record<string, number>; // Specific cost per feature ID
-    clientHourlyRate: number; // Hourly rate charged to client
-    supportHours: Record<SupportDuration, number>; // Monthly hours for support packages
+    featureBaseCost: number;
+    featureCosts: Record<string, number>;
+    clientHourlyRate: number;
+    supportHours: Record<SupportDuration, number>;
     hourlyRates: {
         frontend: number;
         backend: number;

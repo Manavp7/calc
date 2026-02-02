@@ -66,7 +66,7 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
     }
 
     // Get base hours for the idea type
-    const baseHours = BASE_IDEA_HOURS[inputs.ideaType];
+    const baseHours = config.baseIdeaHours ? config.baseIdeaHours[inputs.ideaType] : BASE_IDEA_HOURS[inputs.ideaType];
 
     // Get feature hours
     const featureHours = calculateFeatureHours(inputs.selectedFeatures);
@@ -196,7 +196,7 @@ export function calculateClientPrice(inputs: PricingInputs, config: PricingConfi
     }
 
     // 1. Calculate Base Hours
-    const baseHoursObj = BASE_IDEA_HOURS[inputs.ideaType];
+    const baseHoursObj = config.baseIdeaHours ? config.baseIdeaHours[inputs.ideaType] : BASE_IDEA_HOURS[inputs.ideaType];
     const baseHoursTotal = Object.values(baseHoursObj).reduce((sum, h) => sum + h, 0);
 
     // 2. Calculate Feature Hours

@@ -84,17 +84,7 @@ export default function AdminConfigPage() {
         }
     };
 
-    const updateBaseCost = (key: string, value: string) => {
-        if (!config) return;
-        const numValue = parseInt(value) || 0;
-        setConfig({
-            ...config,
-            baseIdeaCosts: {
-                ...config.baseIdeaCosts,
-                [key]: numValue
-            }
-        });
-    };
+
 
     const updateTechMultiplier = (key: string, value: string) => {
         if (!config) return;
@@ -245,26 +235,70 @@ export default function AdminConfigPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                    {/* Base Costs */}
+                    {/* Base Hours */}
                     <motion.section
                         className="glass p-6 rounded-2xl"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                     >
-                        <h2 className="text-xl font-semibold mb-4 text-primary-400 border-b border-white/10 pb-2">Base Idea Costs (USD)</h2>
+                        <h2 className="text-xl font-semibold mb-4 text-primary-400 border-b border-white/10 pb-2">Base Idea Effort (Hours)</h2>
                         <div className="space-y-4">
-                            {Object.entries(config.baseIdeaCosts).map(([key, value]) => (
-                                <div key={key} className="flex justify-between items-center">
-                                    <label className="text-gray-300 capitalize">{key.replace(/-/g, ' ')}</label>
-                                    <input
-                                        type="number"
-                                        value={value}
-                                        onChange={(e) => updateBaseCost(key, e.target.value)}
-                                        className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-32 text-right focus:border-primary-500 focus:outline-none transition-colors"
-                                    />
-                                </div>
-                            ))}
+                            {config.baseIdeaHours && Object.entries(config.baseIdeaHours).map(([key, hours]) => {
+                                const totalHours = Object.values(hours).reduce((a, b) => a + b, 0);
+
+                                const updateHours = (newTotalStr: string) => {
+                                    if (!config) return;
+                                    const newTotal = parseInt(newTotalStr) || 0;
+                                    const ratio = totalHours > 0 ? newTotal / totalHours : 1;
+
+                                    const newHours = {
+                                        frontend: Math.round(hours.frontend * ratio),
+                                        backend: Math.round(hours.backend * ratio),
+                                        designer: Math.round(hours.designer * ratio),
+                                        qa: Math.round(hours.qa * ratio),
+                                        pm: Math.round(hours.pm * ratio),
+                                    };
+
+                                    // Handle edge case where 0 -> N
+                                    if (totalHours === 0 && newTotal > 0) {
+                                        const split = Math.round(newTotal / 5);
+                                        newHours.frontend = split;
+                                        newHours.backend = split;
+                                        newHours.designer = split;
+                                        newHours.qa = split;
+                                        newHours.pm = split;
+                                    }
+
+                                    setConfig({
+                                        ...config,
+                                        baseIdeaHours: {
+                                            ...config.baseIdeaHours,
+                                            [key]: newHours
+                                        }
+                                    });
+                                };
+
+                                return (
+                                    <div key={key} className="flex justify-between items-center group">
+                                        <div>
+                                            <label className="text-gray-300 capitalize block">{key.replace(/-/g, ' ')}</label>
+                                            <span className="text-xs text-gray-500">
+                                                ~${(totalHours * (config.clientHourlyRate || 120)).toLocaleString()} value
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="number"
+                                                value={totalHours}
+                                                onChange={(e) => updateHours(e.target.value)}
+                                                className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-24 text-right focus:border-primary-500 focus:outline-none transition-colors"
+                                            />
+                                            <span className="text-gray-500 text-sm">hrs</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </motion.section>
 
