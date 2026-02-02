@@ -261,7 +261,7 @@ export const HOURLY_RATES = {
     pm: 45,       // Project Management
 };
 
-export const DEFAULT_CLIENT_HOURLY_RATE = 120; // $120/hr
+export const DEFAULT_CLIENT_HOURLY_RATE = 40; // Updated to match user's explicit rates ($35-$45 range)
 
 // Overhead & Risk
 export const OVERHEAD_PERCENTAGE = 0.15; // 15%

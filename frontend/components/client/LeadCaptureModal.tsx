@@ -124,8 +124,8 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -z-10" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500/10 rounded-full blur-3xl -z-10" />
 
-                <div className="flex items-center justify-between mb-8">
-                    <div>
+                <div className="flex flex-col items-center justify-center mb-8 text-center bg-transparent">
+                    <div className="w-full relative">
                         <h2 className="text-3xl font-bold gradient-text mb-2">
                             {step === 'details' ? 'Unlock Your Estimate' : 'Verify Your Email'}
                         </h2>
@@ -134,15 +134,15 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                 ? 'Enter your details to see the full breakdown.'
                                 : `We sent a code to ${formData.email}`}
                         </p>
+                        {onClose && (
+                            <button
+                                onClick={onClose}
+                                className="absolute -top-2 -right-2 p-2 hover:bg-white/10 rounded-lg transition-colors"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        )}
                     </div>
-                    {onClose && (
-                        <button
-                            onClick={onClose}
-                            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                        >
-                            <X className="w-6 h-6" />
-                        </button>
-                    )}
                 </div>
 
                 {step === 'details' ? (
