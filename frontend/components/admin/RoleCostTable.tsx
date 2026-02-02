@@ -29,7 +29,7 @@ export default function RoleCostTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {internalCost.laborCosts.map((role, index) => {
+                        {(internalCost.laborCosts || []).map((role, index) => {
                             const percentage = (role.totalCost / internalCost.totalLaborCost) * 100;
 
                             return (
@@ -77,7 +77,7 @@ export default function RoleCostTable() {
                         <tr className="bg-white/5 font-bold">
                             <td className="py-4 px-4 text-white">Total Labor Cost</td>
                             <td className="py-4 px-4 text-right text-white">
-                                {internalCost.laborCosts.reduce((sum, role) => sum + role.hours, 0).toLocaleString()}
+                                {(internalCost.laborCosts || []).reduce((sum, role) => sum + role.hours, 0).toLocaleString()}
                             </td>
                             <td className="py-4 px-4 text-right text-gray-400">—</td>
                             <td className="py-4 px-4 text-right text-primary-400 text-xl">
