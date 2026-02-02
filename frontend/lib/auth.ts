@@ -32,10 +32,19 @@ export const authOptions: NextAuthOptions = {
                         }),
                     });
 
-                    const user = await res.json();
+                    const text = await res.text();
+                    console.log('📡 [Auth] Response status:', res.status);
+
+                    let user;
+                    try {
+                        user = text ? JSON.parse(text) : {};
+                    } catch (e) {
+                        console.error('❌ [Auth] Failed to parse backend response:', text);
+                        throw new Error(`Backend error: ${res.status} ${res.statusText}`);
+                    }
 
                     if (!res.ok) {
-                        console.log('❌ [Auth] Backend rejected login:', user.message);
+                        console.log('❌ [Auth] Backend rejected login:', user.message || text);
                         throw new Error(user.message || 'Login failed');
                     }
 
