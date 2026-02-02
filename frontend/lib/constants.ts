@@ -183,24 +183,28 @@ export const SUPPORT_PACKAGES = [
         title: 'No Support',
         description: 'One time delivery',
         monthlyCost: 0,
+        monthlyHours: 0,
     },
     {
         id: '3-months' as SupportDuration,
         title: '3 Months',
         description: 'Quarterly support',
         monthlyCost: 2000,
+        monthlyHours: 15,
     },
     {
         id: '6-months' as SupportDuration,
         title: '6 Months',
         description: 'Bi-annual support',
         monthlyCost: 1800,
+        monthlyHours: 20,
     },
     {
         id: '12-months' as SupportDuration,
         title: '12 Months',
         description: 'Annual support',
         monthlyCost: 1500,
+        monthlyHours: 25,
     },
 ];
 
@@ -257,6 +261,8 @@ export const HOURLY_RATES = {
     pm: 100,
 };
 
+export const DEFAULT_CLIENT_HOURLY_RATE = 120; // $120/hr
+
 // Overhead & Risk
 export const OVERHEAD_PERCENTAGE = 0.15; // 15%
 export const RISK_BUFFER_MIN = 0.10; // 10%
@@ -296,4 +302,11 @@ export const SUPPORT_COSTS: Record<SupportDuration, number> = {
     '3-months': 6000,  // 3 * 2000
     '6-months': 10800, // 6 * 1800
     '12-months': 18000, // 12 * 1500
+};
+
+export const SUPPORT_HOURS: Record<SupportDuration, number> = {
+    'none': 0,
+    '3-months': 15,
+    '6-months': 20,
+    '12-months': 25,
 };

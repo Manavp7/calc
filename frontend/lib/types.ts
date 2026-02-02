@@ -153,6 +153,8 @@ export interface PricingConfiguration {
     supportPackages: Record<SupportDuration, number>;
     featureBaseCost: number; // Fallback cost per feature if specific cost not found
     featureCosts: Record<string, number>; // Specific cost per feature ID
+    clientHourlyRate: number; // Hourly rate charged to client
+    supportHours: Record<SupportDuration, number>; // Monthly hours for support packages
     hourlyRates: {
         frontend: number;
         backend: number;
