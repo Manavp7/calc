@@ -27,7 +27,7 @@ export default function IdeaDefinition() {
                     <span className="inline-block py-0.5 px-2.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-indigo-300 mb-4 backdrop-blur-md">
                         Step 01
                     </span>
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40">
+                    <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 pb-2">
                         What are you building?
                     </h2>
                     <p className="text-slate-400 text-lg font-light max-w-2xl mx-auto leading-relaxed">
