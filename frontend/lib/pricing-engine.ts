@@ -333,7 +333,8 @@ export function calculateTimeline(inputs: PricingInputs, internalCost: InternalC
     const phases = phaseWeights.map((p, i) => {
         // For the last item, give it the remaining weeks to ensure sum is exact
         if (i === phaseWeights.length - 1) {
-            return { name: p.name, duration: Math.max(1, remainingWeeks) };
+            // Ensure we don't return negative duration, but otherwise trust remainingWeeks
+            return { name: p.name, duration: Math.max(0, remainingWeeks) };
         }
 
         let duration = Math.round(finalWeeks * p.weight);
@@ -343,6 +344,11 @@ export function calculateTimeline(inputs: PricingInputs, internalCost: InternalC
 
         // Clamp duration to remaining
         duration = Math.min(duration, remainingWeeks);
+
+        // Prevent taking ALL remaining time if not last phase (save at least 1 week for others if total > phases)
+        if (remainingWeeks - duration < (phaseWeights.length - 1 - i) && finalWeeks > phaseWeights.length) {
+            duration = Math.max(0, remainingWeeks - (phaseWeights.length - 1 - i));
+        }
 
         remainingWeeks -= duration;
         return { name: p.name, duration: Math.max(0, duration) };
