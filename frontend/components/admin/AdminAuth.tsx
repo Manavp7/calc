@@ -11,7 +11,7 @@ export default function AdminAuth({ onAuthenticated }: { onAuthenticated: () => 
         e.preventDefault();
 
         // Simple password check (in production, use proper authentication)
-        const adminPassword = 'pricing2024';
+        const adminPassword = 'pricing2026';
 
         if (password === adminPassword) {
             onAuthenticated();
