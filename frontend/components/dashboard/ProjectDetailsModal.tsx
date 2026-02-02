@@ -308,9 +308,9 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                 </div>
 
                                 {/* Profit Analysis */}
-                                <div className="glass rounded-2xl p-6">
-                                    <h3 className="text-xl font-bold mb-4">Profit Analysis</h3>
-                                    <div className="h-full flex flex-col justify-between py-2">
+                                <div className="glass rounded-2xl p-6 flex flex-col">
+                                    <h3 className="text-xl font-bold mb-4 shrink-0">Profit Analysis</h3>
+                                    <div className="flex-1 flex flex-col justify-between py-2 min-h-0">
                                         <div className="text-center p-4 rounded-xl bg-white/5 flex-grow mb-4 flex flex-col justify-center">
                                             <p className="text-sm text-gray-400 mb-1">Net Profit</p>
                                             <p className="text-3xl font-bold text-accent-400 mb-1">
@@ -319,7 +319,7 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                             <p className="text-xs text-gray-500">After all expenses</p>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-2 gap-3 shrink-0">
                                             <div className="text-center p-3 rounded-xl bg-white/5">
                                                 <p className="text-xs text-gray-400 mb-1">Margin</p>
                                                 <p className={`text-xl font-bold ${displayProfit.healthStatus === 'healthy' ? 'text-green-400' :
