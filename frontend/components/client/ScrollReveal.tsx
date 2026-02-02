@@ -15,7 +15,7 @@ export default function ScrollReveal({
     children,
     direction = 'up',
     delay = 0,
-    duration = 1,
+    duration = 0.5,
 }: ScrollRevealProps) {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -25,8 +25,8 @@ export default function ScrollReveal({
         const el = ref.current;
         if (!el) return;
 
-        const x = direction === 'left' ? 50 : direction === 'right' ? -50 : 0;
-        const y = direction === 'up' ? 50 : direction === 'down' ? -50 : 0;
+        const x = direction === 'left' ? 30 : direction === 'right' ? -30 : 0;
+        const y = direction === 'up' ? 30 : direction === 'down' ? -30 : 0;
 
         const anim = gsap.fromTo(
             el,
@@ -42,10 +42,10 @@ export default function ScrollReveal({
                 y: 0,
                 duration: duration,
                 delay: delay,
-                ease: "power3.out",
+                ease: "power2.out",
                 scrollTrigger: {
                     trigger: el,
-                    start: "top 85%", // Start when top of element hits 85% of viewport
+                    start: "top 95%", // Start much earlier (when element barely enters)
                     toggleActions: "play none none reverse",
                 }
             }

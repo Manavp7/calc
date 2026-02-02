@@ -47,8 +47,8 @@ export default function ProductFormat() {
                                 onClick={() => setProductFormat(format.id)}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.3, delay: index * 0.1 }}
+                                viewport={{ once: true, margin: "50px" }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
                                 whileHover={{ y: -4 }}
                                 className={`
                                     relative p-6 rounded-2xl flex flex-col items-center text-center transition-all duration-300 overflow-hidden group

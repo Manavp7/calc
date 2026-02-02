@@ -45,8 +45,8 @@ export default function IdeaDefinition() {
                                 onClick={() => setIdeaType(idea.id)}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.4, delay: index * 0.1 }}
+                                viewport={{ once: true, margin: "50px" }}
+                                transition={{ duration: 0.3, delay: index * 0.05 }}
                                 className={`
                                     group relative h-full text-left rounded-3xl overflow-hidden transition-all duration-300
                                     ${isSelected

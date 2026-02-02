@@ -53,8 +53,8 @@ export default function FunctionalNeeds() {
                                             onClick={() => toggleFeature(feature.id)}
                                             initial={{ opacity: 0, scale: 0.95 }}
                                             whileInView={{ opacity: 1, scale: 1 }}
-                                            viewport={{ once: true }}
-                                            transition={{ delay: (groupIndex * 0.1) + (featureIndex * 0.05) }}
+                                            viewport={{ once: true, margin: "50px" }}
+                                            transition={{ duration: 0.2, delay: (groupIndex * 0.05) + (featureIndex * 0.02) }}
                                             whileHover={{ y: -4, scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                             className={`
