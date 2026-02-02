@@ -5,7 +5,7 @@ import { Project } from '@/lib/models';
 // POST - Save a new project/quote
 export async function POST(request: NextRequest) {
     try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
         const body = await request.json();
 
         const res = await fetch(`${backendUrl}/api/projects`, {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 // GET - Fetch all projects (for dashboards) or specific project by ID
 export async function GET(request: NextRequest) {
     try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
         const id = request.nextUrl.searchParams.get('id');
         const url = id ? `${backendUrl}/api/projects?id=${id}` : `${backendUrl}/api/projects`;
 
