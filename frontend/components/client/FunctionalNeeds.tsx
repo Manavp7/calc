@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { usePricingStore } from '@/lib/store';
 import { FEATURE_GROUPS } from '@/lib/constants';
+import { FEATURES_DATA } from '@/lib/pricing-data';
 import { Check, Plus } from 'lucide-react';
 
 export default function FunctionalNeeds() {
@@ -46,6 +47,11 @@ export default function FunctionalNeeds() {
                                 {group.features.map((feature, featureIndex) => {
                                     const isSelected = inputs.selectedFeatures.includes(feature.id);
 
+                                    const featureData = FEATURES_DATA.find(f => f.id === feature.id);
+                                    const totalHours = featureData
+                                        ? Object.values(featureData.baseHours).reduce((a, b) => a + b, 0)
+                                        : 0;
+
                                     return (
                                         <motion.button
                                             key={feature.id}
@@ -69,6 +75,9 @@ export default function FunctionalNeeds() {
                                                     ${isSelected ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30' : 'bg-white/5 text-slate-500 group-hover:text-white group-hover:bg-white/10'}
                                                 `}>
                                                     {isSelected ? <Check size={14} strokeWidth={3} /> : <Plus size={14} />}
+                                                </div>
+                                                <div className="text-xs font-mono text-sky-400 bg-sky-500/10 px-2 py-1 rounded">
+                                                    {totalHours} hrs
                                                 </div>
                                             </div>
 
