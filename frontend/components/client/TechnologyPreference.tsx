@@ -8,13 +8,13 @@ export default function TechnologyPreference() {
     const { inputs, setTechStack } = usePricingStore();
 
     return (
-        <section className="section bg-[#030712] relative py-16 border-t border-white/5 z-20 min-h-screen flex flex-col justify-center">
+        <section className="section bg-[#030712] relative py-16 border-t border-white/5 z-20 flex flex-col justify-center">
             <div className="container-custom relative z-10">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.4 }}
                     className="text-center mb-10"
                 >
                     <h2 className="text-3xl md:text-4xl font-bold mb-3 text-white">
@@ -34,14 +34,12 @@ export default function TechnologyPreference() {
                             <motion.button
                                 key={tech.id}
                                 onClick={() => setTechStack(tech.id)}
-                                initial={{ opacity: 0, scale: 0 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
+                                viewport={{ once: true, margin: "100px" }}
                                 transition={{
-                                    type: "spring",
-                                    stiffness: 260,
-                                    damping: 20,
-                                    delay: index * 0.03
+                                    duration: 0.2,
+                                    delay: index * 0.01
                                 }}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
