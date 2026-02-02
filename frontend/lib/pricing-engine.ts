@@ -295,19 +295,26 @@ export function calculateTimeline(inputs: PricingInputs, internalCost: InternalC
     const baseMax = Math.min(8, Math.ceil(inputs.selectedFeatures.length / 2) + 3);
 
     const teamSize = {
-        min: Math.min(baseMin, baseMax),  // Ensure min is not greater than max
-        max: Math.max(baseMin, baseMax),  // Ensure max is not less than min
+        min: Math.min(baseMin, baseMax),
+        max: Math.max(baseMin, baseMax),
     };
 
-    // Calculate weeks (assuming 40 hours/week per person)
+    // Calculate initial raw weeks
     const avgTeamSize = (teamSize.min + teamSize.max) / 2;
-    let totalWeeks = Math.ceil(totalHours / (avgTeamSize * 40));
+    const rawWeeks = Math.ceil(totalHours / (avgTeamSize * 40));
 
-    // Apply delivery speed adjustment
+    // Apply delivery speed adjustment to get FINAL weeks
+    let finalWeeks = rawWeeks;
     const speedMultiplier = config.timelineMultipliers[inputs.deliverySpeed] || 1.0;
+
     if (speedMultiplier > 1) {
-        totalWeeks = Math.ceil(totalWeeks / 1.3); // Compress timeline
+        // Use a more consistent divisor based on the multiplier itself to be mathematically accurate
+        // If speed is 1.3x faster, time is 1/1.3
+        finalWeeks = Math.ceil(rawWeeks / speedMultiplier);
     }
+
+    // Ensure at least 1 week
+    finalWeeks = Math.max(1, finalWeeks);
 
     // Define phases with weights
     const phaseWeights = [
@@ -318,21 +325,33 @@ export function calculateTimeline(inputs: PricingInputs, internalCost: InternalC
         { name: 'Launch & Handoff', weight: 0.08 },
     ];
 
-    // Distribute weeks ensuring sum equals totalWeeks
-    let remainingWeeks = totalWeeks;
+    // Distribute weeks ensuring sum equals finalWeeks
+    let remainingWeeks = finalWeeks;
     const phases = phaseWeights.map((p, i) => {
         // For the last item, give it the remaining weeks to ensure sum is exact
         if (i === phaseWeights.length - 1) {
-            return { name: p.name, duration: Math.max(0, remainingWeeks) };
+            return { name: p.name, duration: Math.max(1, remainingWeeks) };
         }
-        const duration = Math.round(totalWeeks * p.weight);
+
+        let duration = Math.round(finalWeeks * p.weight);
+
+        // Ensure strictly positive phases if possible, but respect total
+        if (duration === 0 && finalWeeks > 3) duration = 1;
+
+        // Clamp duration to remaining
+        duration = Math.min(duration, remainingWeeks);
+
         remainingWeeks -= duration;
         return { name: p.name, duration: Math.max(0, duration) };
     });
 
+    // Safety check: Recalculate total weeks from phases to be 100% sure they match
+    // This handles any edge case in the rounding logic above
+    const calculatedTotalWeeks = phases.reduce((acc, p) => acc + p.duration, 0);
+
     return {
         phases,
-        totalWeeks,
+        totalWeeks: calculatedTotalWeeks, // Use the sum of phases as the source of truth
         teamSize,
     };
 }

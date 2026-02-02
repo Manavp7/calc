@@ -264,32 +264,32 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                     <h3 className="text-xl font-bold mb-4">Cost Breakdown</h3>
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                                            <span className="text-gray-400">Labor Cost</span>
-                                            <span className="font-semibold">
+                                            <span className="text-gray-400 shrink-0">Labor Cost</span>
+                                            <span className="font-semibold truncate ml-2">
                                                 ${displayCost.totalLaborCost.toLocaleString()}
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                                            <span className="text-gray-400">Infrastructure</span>
-                                            <span className="font-semibold">
+                                            <span className="text-gray-400 shrink-0">Infrastructure</span>
+                                            <span className="font-semibold truncate ml-2">
                                                 ${displayCost.infrastructureCost.toLocaleString()}
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                                            <span className="text-gray-400">Overhead</span>
-                                            <span className="font-semibold">
+                                            <span className="text-gray-400 shrink-0">Overhead</span>
+                                            <span className="font-semibold truncate ml-2">
                                                 ${displayCost.overheadCost.toLocaleString()}
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                                            <span className="text-gray-400">Risk Buffer</span>
-                                            <span className="font-semibold">
+                                            <span className="text-gray-400 shrink-0">Risk Buffer</span>
+                                            <span className="font-semibold truncate ml-2">
                                                 ${displayCost.riskBuffer.toLocaleString()}
                                             </span>
                                         </div>
                                         <div className="border-t border-white/10 pt-4 mt-2 flex justify-between items-center">
-                                            <span className="text-lg font-bold">Total Internal Cost</span>
-                                            <span className="text-lg font-bold text-primary-400">
+                                            <span className="text-lg font-bold shrink-0">Total Internal Cost</span>
+                                            <span className="text-lg font-bold text-primary-400 truncate ml-2">
                                                 ${displayCost.totalCost.toLocaleString()}
                                             </span>
                                         </div>
@@ -300,9 +300,9 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                 <div className="glass rounded-2xl p-6">
                                     <h3 className="text-xl font-bold mb-4">Profit Analysis</h3>
                                     <div className="h-full flex flex-col justify-between py-2">
-                                        <div className="text-center p-4 rounded-xl bg-white/5">
+                                        <div className="text-center p-4 rounded-xl bg-white/5 flex-grow flex flex-col justify-center">
                                             <p className="text-sm text-gray-400 mb-2">Net Profit</p>
-                                            <p className="text-4xl font-bold text-accent-400 mb-2">
+                                            <p className="text-3xl font-bold text-accent-400 mb-2">
                                                 ${displayProfit.profit.toLocaleString()}
                                             </p>
                                             <p className="text-xs text-gray-500">After all expenses</p>
