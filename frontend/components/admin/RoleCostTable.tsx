@@ -65,7 +65,7 @@ export default function RoleCostTable() {
                                                 />
                                             </div>
                                             <span className="text-gray-400 text-sm w-12">
-                                                {percentage.toFixed(1)}%
+                                                {internalCost.totalLaborCost ? percentage.toFixed(1) : '0.0'}%
                                             </span>
                                         </div>
                                     </td>
@@ -81,7 +81,7 @@ export default function RoleCostTable() {
                             </td>
                             <td className="py-4 px-4 text-right text-gray-400">—</td>
                             <td className="py-4 px-4 text-right text-primary-400 text-xl">
-                                ${internalCost.totalLaborCost.toLocaleString()}
+                                ${(internalCost.totalLaborCost || 0).toLocaleString()}
                             </td>
                             <td className="py-4 px-4 text-right text-white">100%</td>
                         </tr>
@@ -94,19 +94,19 @@ export default function RoleCostTable() {
                 <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
                     <p className="text-gray-400 text-sm mb-1">Infrastructure (6mo avg)</p>
                     <p className="text-2xl font-bold text-orange-400">
-                        ${internalCost.infrastructureCost.toLocaleString()}
+                        ${(internalCost.infrastructureCost || 0).toLocaleString()}
                     </p>
                 </div>
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
                     <p className="text-gray-400 text-sm mb-1">Overhead (15%)</p>
                     <p className="text-2xl font-bold text-yellow-400">
-                        ${internalCost.overheadCost.toLocaleString()}
+                        ${(internalCost.overheadCost || 0).toLocaleString()}
                     </p>
                 </div>
                 <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
                     <p className="text-gray-400 text-sm mb-1">Risk Buffer</p>
                     <p className="text-2xl font-bold text-red-400">
-                        ${internalCost.riskBuffer.toLocaleString()}
+                        ${(internalCost.riskBuffer || 0).toLocaleString()}
                     </p>
                 </div>
             </div>
