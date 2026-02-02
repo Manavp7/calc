@@ -162,6 +162,24 @@ export default function AdminConfigPage() {
         setConfig({ ...config, featureBaseCost: numValue });
     };
 
+    const updateClientHourlyRate = (value: string) => {
+        if (!config) return;
+        const numValue = parseInt(value) || 0;
+        setConfig({ ...config, clientHourlyRate: numValue });
+    };
+
+    const updateSupportHours = (key: string, value: string) => {
+        if (!config) return;
+        const numValue = parseInt(value) || 0;
+        setConfig({
+            ...config,
+            supportHours: {
+                ...config.supportHours,
+                [key]: numValue
+            }
+        });
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
