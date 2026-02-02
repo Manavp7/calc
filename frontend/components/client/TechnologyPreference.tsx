@@ -8,7 +8,7 @@ export default function TechnologyPreference() {
     const { inputs, setTechStack } = usePricingStore();
 
     return (
-        <section className="section bg-[#030712] relative py-16 border-t border-white/5 z-20 flex flex-col justify-center">
+        <section className="section bg-[#030712] relative py-8 border-t border-white/5 z-20 flex flex-col justify-center">
             <div className="container-custom relative z-10">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
