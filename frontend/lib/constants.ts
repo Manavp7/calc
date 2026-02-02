@@ -222,7 +222,7 @@ export const CLIENT_COST_CATEGORIES = [
         description: 'Backend systems and workflows',
     },
     {
-        label: 'Quality & Reliability',
+        label: 'QA & Testing',
         color: '#10b981',
         description: 'Testing and quality assurance',
     },
@@ -232,7 +232,7 @@ export const CLIENT_COST_CATEGORIES = [
         description: 'Keeping your data safe',
     },
     {
-        label: 'Project Management',
+        label: 'Product Management',
         color: '#6366f1',
         description: 'Coordination and delivery',
     },
