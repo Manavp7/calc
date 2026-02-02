@@ -255,6 +255,9 @@ export const HOURLY_RATES = {
     designer: 35, // UI / UX Design
     qa: 25,       // Quality Assurance & Testing
     pm: 45,       // Project Management
+    infrastructure: 35, // Infrastructure & Tools
+    security: 35, // Security & Data Protection
+    support: 35, // Support & Risk Coverage
 };
 
 export const DEFAULT_CLIENT_HOURLY_RATE = 180; // Updated to maintain margin with new internal rates

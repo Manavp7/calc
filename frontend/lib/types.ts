@@ -76,7 +76,7 @@ export interface PricingInputs {
 }
 
 export interface RoleCost {
-    role: 'frontend' | 'backend' | 'designer' | 'qa' | 'pm';
+    role: 'frontend' | 'backend' | 'designer' | 'qa' | 'pm' | 'infrastructure' | 'security' | 'support';
     hours: number;
     hourlyRate: number;
     totalCost: number;
@@ -172,5 +172,8 @@ export interface PricingConfiguration {
         designer: number;
         qa: number;
         pm: number;
+        infrastructure: number;
+        security: number;
+        support: number;
     };
 }
