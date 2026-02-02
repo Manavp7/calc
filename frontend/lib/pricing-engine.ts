@@ -151,20 +151,42 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
         role.totalCost = role.hours * role.hourlyRate;
     });
 
-    const totalLaborCost = laborCosts.reduce((sum, role) => sum + role.totalCost, 0);
+    // Calculate core labor total for overhead derivation
+    const coreLaborCost = laborCosts.reduce((sum, cost) => sum + cost.totalCost, 0);
 
-    // Infrastructure cost (estimate 6 months average)
+    // Calculate Additional Roles (Infra, Security, Support) based on % of Core
+    // Using average of ranges provided: Infra (4-7% -> 5.5%), Sec (3-6% -> 4.5%), Sup (3-5% -> 4%)
+    const additionalRoles = [
+        { role: 'infrastructure', rate: rates.infrastructure || 35, pct: 0.055 },
+        { role: 'security', rate: rates.security || 35, pct: 0.045 },
+        { role: 'support', rate: rates.support || 35, pct: 0.04 }
+    ];
+
+    additionalRoles.forEach(({ role, rate, pct }) => {
+        const cost = coreLaborCost * pct;
+        const hours = Math.round(cost / rate);
+        laborCosts.push({
+            role: role as any,
+            hours: hours,
+            hourlyRate: rate,
+            totalCost: hours * rate
+        });
+    });
+
+    const totalLaborCost = laborCosts.reduce((sum, item) => sum + item.totalCost, 0);
+
+    // Infrastructure cost (Monthly Server Costs) - Kept separate from labor
     const infraCostMonthly = config.infrastructureCosts ? config.infrastructureCosts[inputs.ideaType] : INFRASTRUCTURE_COSTS[inputs.ideaType];
-    const infrastructureCost = infraCostMonthly * 6;
+    const infrastructureCost = infraCostMonthly * 6; // Est 6 months
 
-    // Overhead (15% of labor)
-    const overheadCost = totalLaborCost * OVERHEAD_PERCENTAGE;
+    // Removed generic overhead as specific roles now cover it
+    const overheadCost = 0;
 
-    // Risk buffer (10-20% based on complexity)
+    // Risk buffer remains as a separate reserve
     const hasAI = inputs.selectedFeatures.includes('ai-recommendations') ||
         inputs.ideaType === 'ai-powered-product';
     const riskBufferPercentage = getRiskBuffer(inputs.selectedFeatures.length, hasAI);
-    const riskBuffer = (totalLaborCost + infrastructureCost + overheadCost) * riskBufferPercentage;
+    const riskBuffer = (totalLaborCost + infrastructureCost) * riskBufferPercentage;
 
     const totalInternalCost = totalLaborCost + infrastructureCost + overheadCost + riskBuffer;
 
@@ -395,6 +417,11 @@ export function generateClientCostBreakdown(internalCost: InternalCost): CostBre
     const qa = internalCost.laborCosts.find(r => r.role === 'qa')?.totalCost || 0;
     const pm = internalCost.laborCosts.find(r => r.role === 'pm')?.totalCost || 0;
 
+    // New explicit roles
+    const security = internalCost.laborCosts.find(r => r.role === 'security')?.totalCost || 0;
+    const infraLabor = internalCost.laborCosts.find(r => r.role === 'infrastructure')?.totalCost || 0;
+    const supportLabor = internalCost.laborCosts.find(r => r.role === 'support')?.totalCost || 0;
+
     return [
         {
             label: CLIENT_COST_CATEGORIES[0].label, // Product Engineering
@@ -425,9 +452,9 @@ export function generateClientCostBreakdown(internalCost: InternalCost): CostBre
             description: CLIENT_COST_CATEGORIES[3].description,
         },
         {
-            label: CLIENT_COST_CATEGORIES[4].label, // Security
-            percentage: Math.round((internalCost.overheadCost * 0.3 / total) * 100),
-            amount: Math.round(internalCost.overheadCost * 0.3),
+            label: CLIENT_COST_CATEGORIES[4].label, // Security & Data
+            percentage: Math.round((security / total) * 100),
+            amount: Math.round(security),
             color: CLIENT_COST_CATEGORIES[4].color,
             description: CLIENT_COST_CATEGORIES[4].description,
         },
@@ -439,16 +466,18 @@ export function generateClientCostBreakdown(internalCost: InternalCost): CostBre
             description: CLIENT_COST_CATEGORIES[5].description,
         },
         {
-            label: CLIENT_COST_CATEGORIES[6].label, // Infrastructure
-            percentage: Math.round(((internalCost.infrastructureCost + internalCost.overheadCost * 0.7) / total) * 100),
-            amount: Math.round(internalCost.infrastructureCost + internalCost.overheadCost * 0.7),
+            label: CLIENT_COST_CATEGORIES[6].label, // Infrastructure & Tools
+            // Includes labor + actual server costs
+            percentage: Math.round(((infraLabor + internalCost.infrastructureCost) / total) * 100),
+            amount: Math.round(infraLabor + internalCost.infrastructureCost),
             color: CLIENT_COST_CATEGORIES[6].color,
             description: CLIENT_COST_CATEGORIES[6].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[7].label, // Support & Risk
-            percentage: Math.round((internalCost.riskBuffer / total) * 100),
-            amount: Math.round(internalCost.riskBuffer),
+            // Includes support labor + risk buffer
+            percentage: Math.round(((supportLabor + internalCost.riskBuffer) / total) * 100),
+            amount: Math.round(supportLabor + internalCost.riskBuffer),
             color: CLIENT_COST_CATEGORIES[7].color,
             description: CLIENT_COST_CATEGORIES[7].description,
         },
