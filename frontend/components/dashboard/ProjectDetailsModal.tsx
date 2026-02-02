@@ -184,18 +184,18 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
 
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <Building className="w-4 h-4 text-primary-400 shrink-0" />
-                                                <span>{fullProject.inputs?.companyName || 'No Company Name'}</span>
+                                                <span>{fullProject.inputs?.companyName || fullProject.companyName || 'No Company Name'}</span>
                                             </div>
                                         </div>
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <Mail className="w-4 h-4 text-primary-400 shrink-0" />
-                                                <span>{fullProject.inputs?.email || 'No Email Provided'}</span>
+                                                <span>{fullProject.inputs?.email || fullProject.clientEmail || 'No Email Provided'}</span>
                                             </div>
 
                                             <div className="flex items-center gap-2 text-gray-400">
                                                 <Phone className="w-4 h-4 text-primary-400 shrink-0" />
-                                                <span>{fullProject.inputs?.phone || 'No Phone Provided'}</span>
+                                                <span>{fullProject.inputs?.phone || fullProject.clientPhone || 'No Phone Provided'}</span>
                                             </div>
                                         </div>
                                     </div>
