@@ -97,46 +97,43 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
 
     const handleExport = () => {
         // Create mock data for PDF export
-        const inputs = fullProject.inputs;
-        const clientPrice = {
-            totalPrice: displayProfit.clientPrice,
-            priceRange: {
-                min: fullProject.clientPrice.min,
-                max: fullProject.clientPrice.max,
-            },
-            basePrice: 0,
-            featuresCost: 0,
-            techMultiplier: 1,
-            complexityMultiplier: 1,
-            timelineMultiplier: 1,
-            supportCost: 0,
+        // Merge root-level client details into inputs for the PDF
+        const pdfInputs = {
+            ...inputs,
+            clientName: inputs.clientName || fullProject.clientName,
+            companyName: inputs.companyName || fullProject.companyName,
+            email: inputs.email || fullProject.clientEmail,
+            phone: inputs.phone || fullProject.clientPhone,
         };
 
-        // Recalculate timeline to ensure consistency with the latest engine logic
-        // This fixes the "3 weeks vs 6 weeks" discrepancy for older saved projects
-        let timeline: Timeline | null = timelineData;
-        try {
-            // We use the displayCost which is already verified/recalculated if needed
-            timeline = calculateTimeline(inputs, displayCost);
-        } catch (e) {
-            console.warn("Could not recalculate timeline for PDF, falling back to stored data", e);
-        }
+        const costBreakdown = [
+            {
+                label: 'Labor',
+                description: 'Development & Engineering',
+                percentage: Math.round((displayCost.totalLaborCost / displayCost.totalCost) * 100),
+                amount: displayCost.totalLaborCost
+            },
+            {
+                label: 'Infrastructure',
+                description: 'Server & Hosting Setup',
+                percentage: Math.round((displayCost.infrastructureCost / displayCost.totalCost) * 100),
+                amount: displayCost.infrastructureCost
+            },
+            {
+                label: 'Overhead',
+                description: 'Management & Tools',
+                percentage: Math.round((displayCost.overheadCost / displayCost.totalCost) * 100),
+                amount: displayCost.overheadCost
+            },
+            {
+                label: 'Risk Buffer',
+                description: 'Contingency Fund',
+                percentage: Math.round((displayCost.riskBuffer / displayCost.totalCost) * 100),
+                amount: displayCost.riskBuffer
+            }
+        ];
 
-        // Final fallback if both recalculation fails AND timelineData was null
-        if (!timeline) {
-            timeline = {
-                totalWeeks: fullProject.clientPrice.timeline || 0,
-                teamSize: {
-                    min: fullProject.clientPrice.teamSizeMin || 1,
-                    max: fullProject.clientPrice.teamSizeMax || 1,
-                },
-                phases: [],
-            };
-        }
-
-        const costBreakdown: Parameters<typeof generatePricingPDF>[3] = []; // Not used in current PDF export extensively, but required by type
-
-        generatePricingPDF(inputs, clientPrice, timeline, costBreakdown);
+        generatePricingPDF(pdfInputs, clientPrice, timeline, costBreakdown);
     };
 
     return (
