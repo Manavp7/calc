@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { AIAnalysis } from '@/lib/ai-types';
 
-const SYSTEM_PROMPT = `You are a world-class software architect and product strategist. Your task is to deeply analyze project ideas and extract structured, high-quality requirements.
+const SYSTEM_PROMPT = `You are a world-class software architect and product strategist. Your task is to deeply analyze project ideas and extract structured, high-quality requirements, while providing strategic technical advice.
+You have access to a paid, high-performance API, so be thorough and detailed.
 
 You must return ONLY valid JSON with no additional text.
 
@@ -16,7 +17,9 @@ Required JSON structure:
   "third_party_integrations": ["array of integrations"],
   "risk_level": "low | medium | high",
   "admin_panel_required": true/false,
-  "ai_features_required": true/false
+  "ai_features_required": true/false,
+  "strategic_insights": "A detailed (2-3 paragraphs) strategic analysis. Explain WHY you chose the complexity/stack. Identify key challenges (technical or market). Suggest an MVP scope versus future features. Be like a CTO giving advice.",
+  "recommended_stack": ["array of specific technologies (e.g., 'Next.js', 'PostgreSQL', 'Stripe', 'AWS S3', 'Flutter')"]
 }
 
 Feature strings should use snake_case and be from this list:
@@ -38,12 +41,14 @@ Feature strings should use snake_case and be from this list:
 
 Rules:
 - Return ONLY the JSON object
-- No markdown, no explanations
+- No markdown, no explanations outside the JSON
 - All fields are required
 - Use lowercase for enum values
 - Infer complexity from feature count and description
 - Be generous with feature detection; if a user hints at something, include the relevant feature.
 - Accurately assess risk and complexity based on the implied scope.
+- Provide high-value, specific strategic insights in the 'strategic_insights' field.
+- Suggest a modern, scalable 'recommended_stack'.
 
 Example Input:
 "I want a uber for dog walking where people can book walkers and track them."
@@ -58,13 +63,11 @@ Example Output:
   "third_party_integrations": ["Google Maps API", "Stripe/PayPal", "Firebase"],
   "risk_level": "medium",
   "admin_panel_required": true,
-  "ai_features_required": false
+  "ai_features_required": false,
+  "strategic_insights": "This is a classic dual-sided marketplace (walkers vs owners). The primary technical challenge is real-time geolocation tracking which consumes battery and requires robust socket connections. For an MVP, focus on the core booking flow and simple tracking. Trust and safety (background checks) are critical non-functional requirements. I recommend starting with a cross-platform mobile framework to save costs.",
+  "recommended_stack": ["React Native", "Node.js", "PostgreSQL", "Socket.io", "Google Maps SDK", "Stripe Connect"]
 }
-
-Detailed Guidelines:
-1. **Complexity:** If the app involves real time tracking, video streaming, or AI, it is 'advanced'. Standard CRUD apps are 'medium'. Simple landing pages are 'basic'.
-2. **Features:** Always include 'user_authentication' and 'admin_dashboard' if the app implies user accounts or management.
-3. **Integrations:** Suggest real-world tools (e.g., Stripe for payments, AWS/Firebase for infrastructure).`;
+`;
 
 function validateAIOutput(data: any): AIAnalysis | null {
     try {
@@ -79,6 +82,7 @@ function validateAIOutput(data: any): AIAnalysis | null {
             'risk_level',
             'admin_panel_required',
             'ai_features_required'
+            // strategic_insights and recommended_stack are optional in type but we want them if possible
         ];
 
         for (const field of requiredFields) {
@@ -118,11 +122,6 @@ function validateAIOutput(data: any): AIAnalysis | null {
             return null;
         }
 
-        if (!Array.isArray(data.third_party_integrations)) {
-            console.error('Invalid third_party_integrations array');
-            return null;
-        }
-
         return data as AIAnalysis;
     } catch (error) {
         console.error('Validation error:', error);
@@ -153,9 +152,9 @@ export async function POST(request: NextRequest) {
             if (!process.env.GEMINI_API_KEY) throw new Error('No API Key');
 
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            // Try the verified available model or fallback to pro
+            // Using gemini-2.0-flash as requested for latest capabilities
             const model = genAI.getGenerativeModel({
-                model: "gemini-2.0-flash", // Using the one we saw in the list
+                model: "gemini-2.0-flash",
                 generationConfig: { responseMimeType: "application/json" }
             });
 

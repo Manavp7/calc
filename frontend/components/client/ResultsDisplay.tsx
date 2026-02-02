@@ -263,6 +263,36 @@ export default function ResultsDisplay() {
                         </div>
                     </div>
 
+                    {/* AI Strategic Insights (Visible if available) */}
+                    {isUnlocked && usePricingStore.getState().aiAnalysis?.strategic_insights && (
+                        <div className="max-w-4xl mx-auto mb-16 relative">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-sky-500/20 to-purple-500/20 rounded-2xl blur"></div>
+                            <div className="glass rounded-2xl p-8 relative">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 rounded-lg bg-primary-500/10">
+                                        <div className="w-5 h-5 text-primary-400">✨</div>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-white">Strategic AI Analysis</h3>
+                                </div>
+                                <p className="text-gray-300 leading-relaxed whitespace-pre-line text-lg">
+                                    {usePricingStore.getState().aiAnalysis?.strategic_insights}
+                                </p>
+                                {usePricingStore.getState().aiAnalysis?.recommended_stack && (
+                                    <div className="mt-6 pt-6 border-t border-white/10">
+                                        <h4 className="text-sm text-gray-400 mb-3 uppercase tracking-wider font-semibold">Recommended Stack</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {usePricingStore.getState().aiAnalysis?.recommended_stack?.map((tech, i) => (
+                                                <span key={i} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sky-300 text-sm font-mono">
+                                                    {tech}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Hourly Breakdown */}
                     <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16 transition-all duration-500 ${!isUnlocked ? 'blur-lg opacity-50 pointer-events-none select-none' : ''}`}>
                         <div className="glass rounded-2xl p-6 text-center border-t-4 border-t-sky-500">

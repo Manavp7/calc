@@ -9,6 +9,8 @@ export interface AIAnalysis {
     risk_level: 'low' | 'medium' | 'high';
     admin_panel_required: boolean;
     ai_features_required: boolean;
+    strategic_insights?: string; // New field for detailed AI insights
+    recommended_stack?: string[]; // New field for tech stack suggestions
 }
 
 export interface FeatureMapping {

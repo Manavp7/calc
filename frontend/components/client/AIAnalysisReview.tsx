@@ -186,7 +186,53 @@ export default function AIAnalysisReview({ analysis, onConfirm, onEdit }: AIAnal
                                 );
                             })}
                         </div>
+
                     </motion.div>
+
+                    {/* Strategic Insights & Stack */}
+                    {(editedAnalysis.strategic_insights || editedAnalysis.recommended_stack) && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            {/* Strategic Insights */}
+                            {editedAnalysis.strategic_insights && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.8 }}
+                                    className="glass rounded-xl p-6 md:col-span-2 border border-sky-500/30 bg-sky-500/5"
+                                >
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <Sparkles className="w-5 h-5 text-sky-400" />
+                                        <h3 className="text-lg font-bold text-white">Strategic Analysis</h3>
+                                    </div>
+                                    <p className="text-gray-300 leading-relaxed text-sm whitespace-pre-line">
+                                        {editedAnalysis.strategic_insights}
+                                    </p>
+                                </motion.div>
+                            )}
+
+                            {/* Recommended Stack */}
+                            {editedAnalysis.recommended_stack && editedAnalysis.recommended_stack.length > 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.85 }}
+                                    className="glass rounded-xl p-6 md:col-span-2"
+                                >
+                                    <h3 className="text-lg font-bold text-white mb-4">Recommended Tech Stack</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {editedAnalysis.recommended_stack.map((tech, idx) => (
+                                            <span
+                                                key={idx}
+                                                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300 text-sm font-mono"
+                                            >
+                                                {tech}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Price Preview */}
                     <motion.div
@@ -231,6 +277,6 @@ export default function AIAnalysisReview({ analysis, onConfirm, onEdit }: AIAnal
                     </motion.div>
                 </motion.div>
             </div>
-        </section>
+        </section >
     );
 }
