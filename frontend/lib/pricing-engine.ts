@@ -178,66 +178,66 @@ export function calculateClientPrice(inputs: PricingInputs, config: PricingConfi
         };
     }
 
-    // Base price for idea type
-    const basePrice = config.baseIdeaCosts[inputs.ideaType];
+    // 1. Calculate Base Hours
+    const baseHoursObj = BASE_IDEA_HOURS[inputs.ideaType];
+    const baseHoursTotal = Object.values(baseHoursObj).reduce((sum, h) => sum + h, 0);
 
-    // Features cost
-    // Use specific feature cost if available, otherwise fallback to base feature cost
-    let featuresCost = 0;
-    if (config.featureCosts && Object.keys(config.featureCosts).length > 0) {
-        inputs.selectedFeatures.forEach(featureId => {
-            const cost = config.featureCosts[featureId] !== undefined
-                ? config.featureCosts[featureId]
-                : config.featureBaseCost;
-            featuresCost += cost;
-        });
-    } else {
-        featuresCost = inputs.selectedFeatures.length * config.featureBaseCost;
-    }
+    // 2. Calculate Feature Hours
+    const featureHoursObj = calculateFeatureHours(inputs.selectedFeatures);
+    const featureHoursTotal = Object.values(featureHoursObj).reduce((sum, h) => sum + h, 0);
 
+    // 3. Multipliers
     // Tech multiplier
     const techMultiplier = inputs.techStack
         ? config.techMultipliers[inputs.techStack]
         : 1.0;
 
-    // Complexity multiplier (Feature based)
+    // Complexity multiplier
     let complexityMultiplier = getComplexityMultiplier(inputs.selectedFeatures.length);
-
-    // AI Explicit Complexity Multiplier (overrides or stacks)
     if (inputs.complexityLevel) {
         const aiComplexityMult = config.complexityMultipliers[inputs.complexityLevel];
-        // We act intelligently: if AI says advanced, we ensure at least that multiplier applies
-        // But we also respect feature count. We take the higher of the two representations to be safe.
         complexityMultiplier = Math.max(complexityMultiplier, aiComplexityMult);
     }
 
     // Timeline multiplier
     const timelineMultiplier = config.timelineMultipliers[inputs.deliverySpeed] || 1.0;
 
-    // Support cost
+    // 4. Calculate Adjusted Development Hours
+    // We apply multipliers to the hours to reflect the increased effort/value
+    const adjustedDevHours = (baseHoursTotal + featureHoursTotal) * techMultiplier * complexityMultiplier * timelineMultiplier;
+
+    // 5. Calculate Development Cost
+    // Use configured client hourly rate or default
+    const hourlyRate = config.clientHourlyRate || 120;
+    const devCost = adjustedDevHours * hourlyRate;
+
+    // 6. Calculate Support Cost
     const supportMonths = inputs.supportDuration === '3-months' ? 3
         : inputs.supportDuration === '6-months' ? 6
             : inputs.supportDuration === '12-months' ? 12
                 : 0;
 
-    // Use config support packages if available (total cost for duration or monthly?)
-    // The constant `SUPPORT_COSTS` in `constants.ts` (which mapped to config.supportPackages)
-    // was defined as TOTAL cost for the duration (e.g. 6000 for 3 months).
-    // So we just grab the value directly.
-    const supportCost = config.supportPackages[inputs.supportDuration] || 0;
+    // Monthly hours from config
+    const monthlySupportHours = config.supportHours[inputs.supportDuration] || 0;
+    const totalSupportHours = monthlySupportHours * supportMonths;
+    const supportCost = totalSupportHours * hourlyRate;
 
-    // Calculate total
-    let totalPrice = (basePrice + featuresCost) * techMultiplier * complexityMultiplier * timelineMultiplier;
-    totalPrice += supportCost;
+    // 7. Total Price
+    let totalPrice = devCost + supportCost;
 
-    // Round to nearest 1000
-    totalPrice = Math.round(totalPrice / 1000) * 1000;
+    // Round to nearest 100
+    totalPrice = Math.round(totalPrice / 100) * 100;
 
     // Price range (±15%)
     const priceRange = {
-        min: Math.round(totalPrice * 0.85 / 1000) * 1000,
-        max: Math.round(totalPrice * 1.15 / 1000) * 1000,
+        min: Math.round(totalPrice * 0.85 / 100) * 100,
+        max: Math.round(totalPrice * 1.15 / 100) * 100,
     };
+
+    // For breakdown consistency, we assign the cost portion of base hours to basePrice
+    // and feature hours to featuresCost
+    const basePrice = (baseHoursTotal * techMultiplier * complexityMultiplier * timelineMultiplier) * hourlyRate;
+    const featuresCost = (featureHoursTotal * techMultiplier * complexityMultiplier * timelineMultiplier) * hourlyRate;
 
     return {
         basePrice,
