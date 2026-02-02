@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ClientPrice, Timeline, CostBreakdown, PricingInputs } from './types';
+import { ROLE_LABELS } from './constants';
 
 export function generatePricingPDF(
     inputs: PricingInputs,
@@ -335,7 +336,8 @@ export function generatePricingPDF(
             yPos += 5;
 
             const laborData = laborBreakdown.map(item => [
-                item.role.charAt(0).toUpperCase() + item.role.slice(1),
+                // Use explicit labels if available, or capitalize
+                (ROLE_LABELS?.[item.role] || item.role.charAt(0).toUpperCase() + item.role.slice(1).replace(/-/g, ' ')),
                 `${item.hours} hrs`,
                 `$${item.rate}/hr`,
                 `$${item.cost.toLocaleString()}`

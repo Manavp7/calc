@@ -262,6 +262,18 @@ export const HOURLY_RATES = {
 
 export const DEFAULT_CLIENT_HOURLY_RATE = 180; // Updated to maintain margin with new internal rates
 
+// Role Display Labels
+export const ROLE_LABELS: Record<string, string> = {
+    frontend: 'Product Engineering',
+    backend: 'Business Logic & Automation',
+    designer: 'UI / UX Design',
+    qa: 'QA & Testing',
+    pm: 'Product Management',
+    infrastructure: 'Infrastructure & Tools',
+    security: 'Security & Data Protection',
+    support: 'Support & Risk Coverage',
+};
+
 // Overhead & Risk
 export const OVERHEAD_PERCENTAGE = 0.15; // 15%
 export const RISK_BUFFER_MIN = 0.10; // 10%

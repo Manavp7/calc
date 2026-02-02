@@ -7,6 +7,7 @@ import Link from 'next/link';
 import StarField from '@/components/three/StarField';
 import { PricingConfiguration } from '@/lib/types';
 import { DEFAULT_CONFIG } from '@/lib/pricing-data';
+import { ROLE_LABELS } from '@/lib/constants';
 
 export default function AdminConfigPage() {
     const [config, setConfig] = useState<PricingConfiguration | null>(null);
@@ -426,7 +427,7 @@ export default function AdminConfigPage() {
                         <div className="space-y-4">
                             {config.hourlyRates && Object.entries(config.hourlyRates).map(([key, value]) => (
                                 <div key={key} className="flex justify-between items-center">
-                                    <label className="text-gray-300 capitalize">{key}</label>
+                                    <label className="text-gray-300">{ROLE_LABELS[key] || key.replace(/-/g, ' ')}</label>
                                     <input
                                         type="number"
                                         value={value}
