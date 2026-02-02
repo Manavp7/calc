@@ -359,129 +359,128 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Detailed Labor Breakdown (Internal Only) */}
-                            {(viewMode === 'admin' || viewMode === 'internal') && displayCost.laborCosts && (
-                                <div className="glass rounded-2xl p-6 lg:col-span-2">
-                                    <h3 className="text-xl font-bold mb-4">Detailed Labor Allocation</h3>
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left">
-                                            <thead>
-                                                <tr className="border-b border-white/10 text-gray-500 text-sm">
-                                                    <th className="pb-3 text-left">Role</th>
-                                                    <th className="pb-3 text-right">Hours</th>
-                                                    <th className="pb-3 text-right">Rate</th>
-                                                    <th className="pb-3 text-right">Cost</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5">
-                                                {displayCost.laborCosts.map((role: any) => (
-                                                    <tr key={role.role} className="group hover:bg-white/5 transition-colors">
-                                                        <td className="py-3 text-white font-medium">
-                                                            {ROLE_LABELS?.[role.role] || role.role.replace(/-/g, ' ')}
-                                                        </td>
-                                                        <td className="py-3 text-right text-gray-400">{role.hours}h</td>
-                                                        <td className="py-3 text-right text-gray-400">${role.hourlyRate}/hr</td>
-                                                        <td className="py-3 text-right text-white font-mono">
-                                                            ${role.totalCost.toLocaleString()}
-                                                        </td>
+                                {/* Detailed Labor Breakdown (Internal Only) */}
+                                {(viewMode === 'admin' || viewMode === 'internal') && displayCost.laborCosts && (
+                                    <div className="glass rounded-2xl p-6 lg:col-span-2">
+                                        <h3 className="text-xl font-bold mb-4">Detailed Labor Allocation</h3>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left">
+                                                <thead>
+                                                    <tr className="border-b border-white/10 text-gray-500 text-sm">
+                                                        <th className="pb-3 text-left">Role</th>
+                                                        <th className="pb-3 text-right">Hours</th>
+                                                        <th className="pb-3 text-right">Rate</th>
+                                                        <th className="pb-3 text-right">Cost</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody className="divide-y divide-white/5">
+                                                    {displayCost.laborCosts.map((role: any) => (
+                                                        <tr key={role.role} className="group hover:bg-white/5 transition-colors">
+                                                            <td className="py-3 text-white font-medium">
+                                                                {ROLE_LABELS?.[role.role] || role.role.replace(/-/g, ' ')}
+                                                            </td>
+                                                            <td className="py-3 text-right text-gray-400">{role.hours}h</td>
+                                                            <td className="py-3 text-right text-gray-400">${role.hourlyRate}/hr</td>
+                                                            <td className="py-3 text-right text-white font-mono">
+                                                                ${role.totalCost.toLocaleString()}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {/* Profit Analysis */}
-                            <div className="glass rounded-2xl p-6 flex flex-col">
-                                <h3 className="text-xl font-bold mb-4 shrink-0">Profit Analysis</h3>
-                                <div className="flex-1 flex flex-col justify-between py-2 min-h-0">
-                                    <div className="text-center p-4 rounded-xl bg-white/5 flex-grow mb-4 flex flex-col justify-center">
-                                        <p className="text-sm text-gray-400 mb-1">Net Profit</p>
-                                        <p className="text-3xl font-bold text-accent-400 mb-1">
-                                            ${displayProfit.profit.toLocaleString()}
-                                        </p>
-                                        <p className="text-xs text-gray-500">After all expenses</p>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3 shrink-0">
-                                        <div className="text-center p-3 rounded-xl bg-white/5">
-                                            <p className="text-xs text-gray-400 mb-1">Margin</p>
-                                            <p className={`text-xl font-bold ${displayProfit.healthStatus === 'healthy' ? 'text-green-400' :
-                                                displayProfit.healthStatus === 'warning' ? 'text-yellow-400' :
-                                                    'text-red-400'
-                                                }`}>
-                                                {displayProfit.profitMargin.toFixed(1)}%
+                                {/* Profit Analysis */}
+                                <div className="glass rounded-2xl p-6 flex flex-col">
+                                    <h3 className="text-xl font-bold mb-4 shrink-0">Profit Analysis</h3>
+                                    <div className="flex-1 flex flex-col justify-between py-2 min-h-0">
+                                        <div className="text-center p-4 rounded-xl bg-white/5 flex-grow mb-4 flex flex-col justify-center">
+                                            <p className="text-sm text-gray-400 mb-1">Net Profit</p>
+                                            <p className="text-3xl font-bold text-accent-400 mb-1">
+                                                ${displayProfit.profit.toLocaleString()}
                                             </p>
+                                            <p className="text-xs text-gray-500">After all expenses</p>
                                         </div>
-                                        <div className="text-center p-3 rounded-xl bg-white/5">
-                                            <p className="text-xs text-gray-400 mb-1">Health</p>
-                                            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${displayProfit.healthStatus === 'healthy' ? 'bg-green-500/20 text-green-400 border border-green-500/20' :
-                                                displayProfit.healthStatus === 'warning' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20' :
-                                                    'bg-red-500/0 text-red-400 border border-red-500/20'
-                                                }`}>
-                                                {displayProfit.healthStatus}
-                                            </span>
+
+                                        <div className="grid grid-cols-2 gap-3 shrink-0">
+                                            <div className="text-center p-3 rounded-xl bg-white/5">
+                                                <p className="text-xs text-gray-400 mb-1">Margin</p>
+                                                <p className={`text-xl font-bold ${displayProfit.healthStatus === 'healthy' ? 'text-green-400' :
+                                                    displayProfit.healthStatus === 'warning' ? 'text-yellow-400' :
+                                                        'text-red-400'
+                                                    }`}>
+                                                    {displayProfit.profitMargin.toFixed(1)}%
+                                                </p>
+                                            </div>
+                                            <div className="text-center p-3 rounded-xl bg-white/5">
+                                                <p className="text-xs text-gray-400 mb-1">Health</p>
+                                                <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${displayProfit.healthStatus === 'healthy' ? 'bg-green-500/20 text-green-400 border border-green-500/20' :
+                                                    displayProfit.healthStatus === 'warning' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20' :
+                                                        'bg-red-500/0 text-red-400 border border-red-500/20'
+                                                    }`}>
+                                                    {displayProfit.healthStatus}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Project Details Footer */}
-                        <div className="glass rounded-2xl p-6 mb-8">
-                            <h3 className="text-xl font-bold mb-4">Technical Specifications</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div>
-                                    <p className="text-sm text-gray-400 mb-1">Project Type</p>
-                                    <p className="font-semibold capitalize text-white">
-                                        {fullProject.inputs.ideaType?.replace(/-/g, ' ')}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-400 mb-1">Platform</p>
-                                    <p className="font-semibold capitalize text-white">
-                                        {fullProject.inputs.productFormat?.replace(/-/g, ' ')}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-400 mb-1">Tech Stack</p>
-                                    <p className="font-semibold capitalize text-white">
-                                        {fullProject.inputs.techStack?.replace(/-/g, ' ')}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-400 mb-1">Scale</p>
-                                    <p className="font-semibold text-white">
-                                        {fullProject.inputs.selectedFeatures?.length || 0} features
-                                    </p>
+                            {/* Project Details Footer */}
+                            <div className="glass rounded-2xl p-6 mb-8">
+                                <h3 className="text-xl font-bold mb-4">Technical Specifications</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-1">Project Type</p>
+                                        <p className="font-semibold capitalize text-white">
+                                            {fullProject.inputs.ideaType?.replace(/-/g, ' ')}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-1">Platform</p>
+                                        <p className="font-semibold capitalize text-white">
+                                            {fullProject.inputs.productFormat?.replace(/-/g, ' ')}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-1">Tech Stack</p>
+                                        <p className="font-semibold capitalize text-white">
+                                            {fullProject.inputs.techStack?.replace(/-/g, ' ')}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-1">Scale</p>
+                                        <p className="font-semibold text-white">
+                                            {fullProject.inputs.selectedFeatures?.length || 0} features
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-4">
-                            <button
-                                onClick={handleExport}
-                                className="btn-primary flex-1 flex items-center justify-center gap-2 group"
-                            >
-                                <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-                                Download Quotation PDF
-                            </button>
-                            <button
-                                onClick={onClose}
-                                className="px-8 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition-colors font-semibold"
-                            >
-                                Close
-                            </button>
+                            {/* Actions */}
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={handleExport}
+                                    className="btn-primary flex-1 flex items-center justify-center gap-2 group"
+                                >
+                                    <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+                                    Download Quotation PDF
+                                </button>
+                                <button
+                                    onClick={onClose}
+                                    className="px-8 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition-colors font-semibold"
+                                >
+                                    Close
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </motion.div>
-        </>
-    )
-}
+                    </motion.div>
+                </>
+            )
+            }
         </AnimatePresence >
     );
 }
