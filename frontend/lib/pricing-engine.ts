@@ -309,14 +309,26 @@ export function calculateTimeline(inputs: PricingInputs, internalCost: InternalC
         totalWeeks = Math.ceil(totalWeeks / 1.3); // Compress timeline
     }
 
-    // Define phases
-    const phases = [
-        { name: 'Discovery & Planning', duration: Math.ceil(totalWeeks * 0.15) },
-        { name: 'Design', duration: Math.ceil(totalWeeks * 0.20) },
-        { name: 'Development', duration: Math.ceil(totalWeeks * 0.45) },
-        { name: 'Testing & QA', duration: Math.ceil(totalWeeks * 0.12) },
-        { name: 'Launch & Handoff', duration: Math.ceil(totalWeeks * 0.08) },
+    // Define phases with weights
+    const phaseWeights = [
+        { name: 'Discovery & Planning', weight: 0.15 },
+        { name: 'Design', weight: 0.20 },
+        { name: 'Development', weight: 0.45 },
+        { name: 'Testing & QA', weight: 0.12 },
+        { name: 'Launch & Handoff', weight: 0.08 },
     ];
+
+    // Distribute weeks ensuring sum equals totalWeeks
+    let remainingWeeks = totalWeeks;
+    const phases = phaseWeights.map((p, i) => {
+        // For the last item, give it the remaining weeks to ensure sum is exact
+        if (i === phaseWeights.length - 1) {
+            return { name: p.name, duration: Math.max(0, remainingWeeks) };
+        }
+        const duration = Math.round(totalWeeks * p.weight);
+        remainingWeeks -= duration;
+        return { name: p.name, duration: Math.max(0, duration) };
+    });
 
     return {
         phases,

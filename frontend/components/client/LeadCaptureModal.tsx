@@ -249,7 +249,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                     type="text"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                                    className={`w-full bg-white/5 border ${errors.otp ? 'border-red-500' : 'border-white/10'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors text-center letter-spacing-widest text-xl`}
+                                    className={`w-full bg-white/5 border ${errors.otp ? 'border-red-500' : 'border-white/10'} rounded-xl py-3 pl-12 pr-12 text-white focus:outline-none focus:border-primary-500 transition-colors text-center tracking-widest text-2xl font-bold`}
                                     placeholder="000000"
                                     autoFocus
                                 />
