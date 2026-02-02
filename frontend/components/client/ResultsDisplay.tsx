@@ -201,47 +201,29 @@ export default function ResultsDisplay() {
 
                     {/* Unlock CTA (Visible when locked) */}
                     {/* Unlock CTA / Inline Input Form */}
+                    {/* Unlock CTA */}
                     {!isUnlocked && (
-                        <div className="max-w-xl mx-auto mb-20">
-                            <AnimatePresence mode="wait">
-                                {!showUnlockModal ? (
-                                    <motion.div
-                                        key="cta"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -20 }}
-                                        className="text-center"
-                                    >
-                                        <div className="glass p-8 rounded-3xl border-primary-500/30 shadow-[0_0_50px_-12px_rgba(14,165,233,0.3)]">
-                                            <Lock className="w-12 h-12 text-primary-400 mx-auto mb-4" />
-                                            <h3 className="text-3xl font-bold text-white mb-2">Unlock Your Estimate</h3>
-                                            <p className="text-gray-400 mb-8 max-w-sm mx-auto leading-relaxed">
-                                                Get the full breakdown, detailed timeline, and brochure sent to your email.
-                                            </p>
-                                            <button
-                                                onClick={() => setShowUnlockModal(true)}
-                                                className="w-full btn-primary py-4 text-lg shadow-lg shadow-primary-500/20 rounded-xl"
-                                            >
-                                                Unlock Full Details
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
-                                        key="form"
-                                        initial={{ opacity: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.95 }}
-                                    >
-                                        <LeadCaptureModal
-                                            isOpen={true}
-                                            variant="inline"
-                                            onClose={() => setShowUnlockModal(false)}
-                                            onSubmit={handleUnlockSubmit}
-                                        />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                        <div className="max-w-xl mx-auto mb-20 text-center">
+                            <div className="glass p-8 rounded-3xl border-primary-500/30 shadow-[0_0_50px_-12px_rgba(14,165,233,0.3)]">
+                                <Lock className="w-12 h-12 text-primary-400 mx-auto mb-4" />
+                                <h3 className="text-3xl font-bold text-white mb-2">Unlock Your Estimate</h3>
+                                <p className="text-gray-400 mb-8 max-w-sm mx-auto leading-relaxed">
+                                    Get the full breakdown, detailed timeline, and brochure sent to your email.
+                                </p>
+                                <button
+                                    onClick={() => setShowUnlockModal(true)}
+                                    className="w-full btn-primary py-4 text-lg shadow-lg shadow-primary-500/20 rounded-xl"
+                                >
+                                    Unlock Full Details
+                                </button>
+                            </div>
+
+                            <LeadCaptureModal
+                                isOpen={showUnlockModal}
+                                variant="modal"
+                                onClose={() => setShowUnlockModal(false)}
+                                onSubmit={handleUnlockSubmit}
+                            />
                         </div>
                     )}
 

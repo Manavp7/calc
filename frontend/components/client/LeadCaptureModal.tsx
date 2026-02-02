@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Building, Mail, Phone, ChevronRight, Lock, Unlock } from 'lucide-react';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { countryCodes } from '@/lib/countryCodes';
 
@@ -283,7 +284,10 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
         return Content;
     }
 
-    return (
+    // Portal for modal variant
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -291,12 +295,13 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
                         onClick={onClose}
                     />
                     {Content}
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 }
