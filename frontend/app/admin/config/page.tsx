@@ -324,15 +324,7 @@ export default function AdminConfigPage() {
                                     />
                                 </div>
                             ))}
-                            <div className="flex justify-between items-center pt-4 border-t border-white/10">
-                                <label className="text-gray-300 font-medium">Feature Base Cost (USD)</label>
-                                <input
-                                    type="number"
-                                    value={config.featureBaseCost}
-                                    onChange={(e) => updateFeatureBaseCost(e.target.value)}
-                                    className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-32 text-right focus:border-purple-500 focus:outline-none transition-colors"
-                                />
-                            </div>
+
                         </div>
                     </motion.section>
 
