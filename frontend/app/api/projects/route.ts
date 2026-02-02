@@ -5,15 +5,20 @@ import { Project } from '@/lib/models';
 // POST - Save a new project/quote
 export async function POST(request: NextRequest) {
     try {
-        await dbConnect();
-
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
         const body = await request.json();
 
-        const project = await Project.create(body);
+        const res = await fetch(`${backendUrl}/api/projects`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
 
-        return NextResponse.json(project, { status: 201 });
+        const data = await res.json();
+
+        return NextResponse.json(data, { status: res.status });
     } catch (error) {
-        console.error('Error creating project:', error);
+        console.error('Error proxying create project:', error);
         return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
     }
 }
@@ -21,30 +26,16 @@ export async function POST(request: NextRequest) {
 // GET - Fetch all projects (for dashboards) or specific project by ID
 export async function GET(request: NextRequest) {
     try {
-        const searchParams = request.nextUrl.searchParams;
-        const id = searchParams.get('id');
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+        const id = request.nextUrl.searchParams.get('id');
+        const url = id ? `${backendUrl}/api/projects?id=${id}` : `${backendUrl}/api/projects`;
 
-        await dbConnect();
+        const res = await fetch(url);
+        const data = await res.json();
 
-        // If ID is provided, fetch specific project
-        if (id) {
-            const project = await Project.findById(id);
-
-            if (!project) {
-                return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-            }
-
-            return NextResponse.json(project);
-        }
-
-        // Otherwise, fetch all projects (for dashboards)
-        const projects = await Project.find({})
-            .sort({ createdAt: -1 })
-            .limit(100);
-
-        return NextResponse.json({ projects });
+        return NextResponse.json(data, { status: res.status });
     } catch (error) {
-        console.error('Error fetching project(s):', error);
+        console.error('Error proxying project(s):', error);
         return NextResponse.json({ error: 'Failed to fetch project(s)' }, { status: 500 });
     }
 }
