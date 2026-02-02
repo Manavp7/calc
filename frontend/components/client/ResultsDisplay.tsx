@@ -263,6 +263,33 @@ export default function ResultsDisplay() {
                         </div>
                     </div>
 
+                    {/* Hourly Breakdown */}
+                    <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16 transition-all duration-500 ${!isUnlocked ? 'blur-lg opacity-50 pointer-events-none select-none' : ''}`}>
+                        <div className="glass rounded-2xl p-6 text-center border-t-4 border-t-sky-500">
+                            <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-2">Development</h3>
+                            <p className="text-3xl font-bold text-white mb-1">
+                                {isUnlocked ? <AnimatedNumber value={clientPrice.totalDevHours || 0} suffix=" hrs" /> : 'XXX hrs'}
+                            </p>
+                            <p className="text-xs text-gray-500">Design, Code, QA, PM</p>
+                        </div>
+
+                        <div className="glass rounded-2xl p-6 text-center border-t-4 border-t-purple-500">
+                            <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-2">Support & Maint.</h3>
+                            <p className="text-3xl font-bold text-white mb-1">
+                                {isUnlocked ? <AnimatedNumber value={clientPrice.totalSupportHours || 0} suffix=" hrs" /> : 'XX hrs'}
+                            </p>
+                            <p className="text-xs text-gray-500">Server, Updates, fixes</p>
+                        </div>
+
+                        <div className="glass rounded-2xl p-6 text-center border-t-4 border-t-emerald-500">
+                            <h3 className="text-gray-400 text-sm uppercase tracking-wider mb-2">Hourly Rate</h3>
+                            <p className="text-3xl font-bold text-white mb-1">
+                                {isUnlocked ? `$${clientPrice.hourlyRate || 120}` : '$XXX'}
+                            </p>
+                            <p className="text-xs text-gray-500">Blended team rate</p>
+                        </div>
+                    </div>
+
                     {/* Cost Breakdown - Only visible when unlocked */}
                     <div className={`transition-all duration-500 ${!isUnlocked ? 'blur-lg opacity-30 pointer-events-none select-none' : ''}`}>
                         <h3 className="text-3xl font-bold text-center mb-8">
