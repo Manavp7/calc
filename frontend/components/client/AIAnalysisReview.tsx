@@ -176,9 +176,7 @@ export default function AIAnalysisReview({ analysis, onConfirm, onEdit }: AIAnal
                                                     <span className="text-xs text-gray-400">
                                                         {feature.category}
                                                     </span>
-                                                    <span className="text-sm text-primary-400 font-medium">
-                                                        +${(feature.cost / 1000).toFixed(0)}k
-                                                    </span>
+
                                                 </div>
                                             </div>
                                         </div>
