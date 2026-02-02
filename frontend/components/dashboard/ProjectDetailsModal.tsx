@@ -6,7 +6,7 @@ import { generatePricingPDF } from '@/lib/pdf-export';
 import { useEffect, useState } from 'react';
 import { calculateInternalCost, calculateProfit, calculateTimeline } from '@/lib/pricing-engine';
 import GanttChart from '@/components/client/GanttChart';
-import { Project, IdeaType, ProductFormat, DeliverySpeed, SupportDuration, TechStack, Timeline, RoleCost } from '@/lib/types';
+import { IdeaType, ProductFormat, DeliverySpeed, SupportDuration, TechStack, Timeline, RoleCost } from '@/lib/types';
 
 interface ProjectDetailsModalProps {
     project: any;
