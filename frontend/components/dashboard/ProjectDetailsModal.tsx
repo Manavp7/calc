@@ -174,7 +174,21 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
             }
         ];
 
-        generatePricingPDF(pdfInputs, clientPrice, timeline, costBreakdown);
+        // Prepare internal data if we are in admin mode
+        const profitData = viewMode === 'admin' ? {
+            profit: displayProfit.profit,
+            margin: displayProfit.profitMargin,
+            health: displayProfit.healthStatus
+        } : undefined;
+
+        const laborData = viewMode === 'admin' ? displayCost.laborCosts.map(l => ({
+            role: l.role,
+            hours: l.hours,
+            rate: l.hourlyRate,
+            cost: l.totalCost
+        })) : undefined;
+
+        generatePricingPDF(pdfInputs, clientPrice, timeline, costBreakdown, profitData, laborData);
     };
 
     return (

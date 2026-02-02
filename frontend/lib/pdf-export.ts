@@ -6,7 +6,9 @@ export function generatePricingPDF(
     inputs: PricingInputs,
     clientPrice: ClientPrice,
     timeline: Timeline,
-    costBreakdown: CostBreakdown[]
+    costBreakdown: CostBreakdown[],
+    profitAnalysis?: { profit: number; margin: number; health: string },
+    laborBreakdown?: { role: string; hours: number; rate: number; cost: number }[]
 ) {
     const doc = new jsPDF();
 
@@ -276,27 +278,120 @@ export function generatePricingPDF(
         margin: { left: 15 }
     });
 
+});
 
-    // Footer
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(...grayText);
-        doc.text(
-            `Page ${i} of ${pageCount}`,
-            105,
-            290,
-            { align: 'center' }
-        );
-        doc.text(
-            'This is an estimate and subject to change based on project requirements',
-            105,
-            285,
-            { align: 'center' }
-        );
+// @ts-ignore
+yPos = doc.lastAutoTable.finalY + 20;
+
+// --- INTERNAL SECTIONS (Company Head Only) ---
+if (profitAnalysis || laborBreakdown) {
+    if (yPos > 180) {
+        doc.addPage();
+        yPos = 20;
     }
 
-    // Save the PDF
-    doc.save(`project-estimate-${new Date().toISOString().split('T')[0]}.pdf`);
+    // Profit Analysis Section
+    if (profitAnalysis) {
+        doc.setFillColor(darkBg[0], darkBg[1], darkBg[2]); // Dark background for sensitive info
+        doc.rect(15, yPos, 180, 50, 'F');
+
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.text('Internal Profitability', 25, yPos + 12);
+
+        // Net Profit
+        doc.setFontSize(10);
+        doc.setTextColor(156, 163, 175); // gray-400
+        doc.text('Net Profit', 25, yPos + 25);
+        doc.setFontSize(20);
+        doc.setTextColor(16, 185, 129); // green-500
+        doc.text(`$${profitAnalysis.profit.toLocaleString()}`, 25, yPos + 35);
+
+        // Margin
+        doc.setFontSize(10);
+        doc.setTextColor(156, 163, 175); // gray-400
+        doc.text('Margin', 90, yPos + 25);
+        doc.setFontSize(20);
+        doc.setTextColor(profitAnalysis.health === 'healthy' ? '#10B981' : profitAnalysis.health === 'warning' ? '#F59E0B' : '#EF4444');
+        doc.text(`${profitAnalysis.margin.toFixed(1)}%`, 90, yPos + 35);
+
+        // Health
+        doc.setFontSize(10);
+        doc.setTextColor(156, 163, 175); // gray-400
+        doc.text('Health Status', 145, yPos + 25);
+        doc.setFontSize(14);
+        doc.setTextColor(255, 255, 255);
+        doc.text(profitAnalysis.health.toUpperCase(), 145, yPos + 35);
+
+        yPos += 65;
+    }
+
+    // Resource Allocation Table
+    if (laborBreakdown) {
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Resource Allocation', 15, yPos);
+        yPos += 5;
+
+        const laborData = laborBreakdown.map(item => [
+            item.role.charAt(0).toUpperCase() + item.role.slice(1),
+            `${item.hours} hrs`,
+            `$${item.rate}/hr`,
+            `$${item.cost.toLocaleString()}`
+        ]);
+
+        autoTable(doc, {
+            startY: yPos,
+            head: [['Role', 'Hours', 'Rate', 'Total Cost']],
+            body: laborData,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [71, 85, 105], // slate-600
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            bodyStyles: {
+                fontSize: 9,
+                textColor: [50, 50, 50]
+            },
+            margin: { left: 15, right: 15 },
+            columnStyles: {
+                0: { cellWidth: 60 },
+                1: { cellWidth: 30, halign: 'center' },
+                2: { cellWidth: 35, halign: 'right' },
+                3: { cellWidth: 45, halign: 'right' }
+            }
+        });
+
+        // @ts-ignore
+        yPos = doc.lastAutoTable.finalY + 20;
+    }
+}
+
+
+// Footer
+const pageCount = doc.getNumberOfPages();
+for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(...grayText);
+    doc.text(
+        `Page ${i} of ${pageCount}`,
+        105,
+        290,
+        { align: 'center' }
+    );
+    doc.text(
+        'This is an estimate and subject to change based on project requirements',
+        105,
+        285,
+        { align: 'center' }
+    );
+}
+
+// Save the PDF
+doc.save(`project-estimate-${new Date().toISOString().split('T')[0]}.pdf`);
 }
