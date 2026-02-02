@@ -26,8 +26,16 @@ export default function AdminConfigPage() {
             const res = await fetch('/api/admin/config');
             if (res.ok) {
                 const data = await res.json();
-                setConfig(data);
-                setOriginalConfig(data);
+                // Merge with default config to ensure all fields exist (handling migration/missing fields)
+                const fullConfig = { ...DEFAULT_CONFIG, ...data };
+
+                // Deep merge specific objects if needed to avoid overwriting entire objects with partial data
+                if (data.infrastructureCosts) fullConfig.infrastructureCosts = { ...DEFAULT_CONFIG.infrastructureCosts, ...data.infrastructureCosts };
+                if (data.formatMultipliers) fullConfig.formatMultipliers = { ...DEFAULT_CONFIG.formatMultipliers, ...data.formatMultipliers };
+                if (data.hourlyRates) fullConfig.hourlyRates = { ...DEFAULT_CONFIG.hourlyRates, ...data.hourlyRates };
+
+                setConfig(fullConfig);
+                setOriginalConfig(fullConfig);
             } else {
                 throw new Error('Failed to fetch config');
             }
@@ -251,7 +259,7 @@ export default function AdminConfigPage() {
                     >
                         <h2 className="text-xl font-semibold mb-4 text-purple-400 border-b border-white/10 pb-2">Platform Multipliers</h2>
                         <div className="space-y-4">
-                            {Object.entries(config.formatMultipliers).map(([key, value]) => (
+                            {config.formatMultipliers && Object.entries(config.formatMultipliers).map(([key, value]) => (
                                 <div key={key} className="flex justify-between items-center">
                                     <label className="text-gray-300 capitalize">{key.replace(/-/g, ' ')}</label>
                                     <input
@@ -391,41 +399,6 @@ export default function AdminConfigPage() {
                         </div>
                     </motion.section>
 
-                    {/* Hourly Rates (Internal) */}
-                    <motion.section
-                        className="glass p-6 rounded-2xl"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.38 }}
-                    >
-                        <h2 className="text-xl font-semibold mb-4 text-blue-400 border-b border-white/10 pb-2">Internal Team Hourly Rates (USD/hr)</h2>
-                        <div className="space-y-4">
-                            {config.hourlyRates && Object.entries(config.hourlyRates).map(([key, value]) => (
-                                <div key={key} className="flex justify-between items-center">
-                                    <label className="text-gray-300 capitalize">{key}</label>
-                                    <input
-                                        type="number"
-                                        value={value}
-                                        onChange={(e) => {
-                                            if (!config) return;
-                                            const numValue = parseInt(e.target.value) || 0;
-                                            setConfig({
-                                                ...config,
-                                                hourlyRates: {
-                                                    ...config.hourlyRates,
-                                                    [key]: numValue
-                                                }
-                                            });
-                                        }}
-                                        className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-32 text-right focus:border-blue-500 focus:outline-none transition-colors"
-                                    />
-                                </div>
-                            ))}
-                            {!config.hourlyRates && (
-                                <p className="text-gray-500 text-sm italic">Save configuration to initialize hourly rates.</p>
-                            )}
-                        </div>
-                    </motion.section>
 
                     {/* Timeline & Support */}
                     <motion.section
