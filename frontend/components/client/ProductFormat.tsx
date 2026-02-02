@@ -17,7 +17,7 @@ export default function ProductFormat() {
     };
 
     return (
-        <section className="section relative py-20 overflow-hidden bg-[#030712]">
+        <section className="section relative py-20 overflow-hidden bg-[#030712] min-h-screen flex flex-col justify-center">
             <div className="container-custom relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

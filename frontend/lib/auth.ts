@@ -2,9 +2,7 @@ import { getServerSession } from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
 import type { UserRole } from '@/types/next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
-import { dbConnect } from '@/lib/db';
-import { User } from '@/lib/models';
+
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -19,43 +17,33 @@ export const authOptions: NextAuthOptions = {
                     console.log('🔐 [Auth] Starting authorization for:', credentials?.email);
 
                     if (!credentials?.email || !credentials?.password) {
-                        console.log('❌ [Auth] Missing credentials');
-                        throw new Error('Invalid credentials');
+                        throw new Error('Missing credentials');
                     }
 
-                    console.log('📡 [Auth] Connecting to database...');
-                    await dbConnect();
-                    console.log('✅ [Auth] Database connected');
+                    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+                    console.log(`📡 [Auth] Connecting to backend at ${backendUrl}...`);
 
-                    const user = await User.findOne({ email: credentials.email });
-                    console.log('👤 [Auth] User lookup result:', user ? 'Found' : 'Not Found');
+                    const res = await fetch(`${backendUrl}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: credentials.email,
+                            password: credentials.password,
+                        }),
+                    });
 
-                    if (!user) {
-                        console.log('❌ [Auth] User not found');
-                        throw new Error('No user found with this email');
-                    }
+                    const user = await res.json();
 
-                    const isPasswordValid = await bcrypt.compare(
-                        credentials.password,
-                        user.password
-                    );
-                    console.log('🔑 [Auth] Password valid:', isPasswordValid);
-
-                    if (!isPasswordValid) {
-                        console.log('❌ [Auth] Invalid password');
-                        throw new Error('Invalid password');
+                    if (!res.ok) {
+                        console.log('❌ [Auth] Backend rejected login:', user.message);
+                        throw new Error(user.message || 'Login failed');
                     }
 
                     console.log('✅ [Auth] Authorization successful');
-                    return {
-                        id: user._id.toString(),
-                        email: user.email,
-                        name: user.name,
-                        role: user.role,
-                    };
+                    return user;
                 } catch (error) {
                     console.error('🚨 [Auth] Authorization error:', error);
-                    throw error; // Rethrow to let NextAuth handle it
+                    throw error;
                 }
             },
         }),

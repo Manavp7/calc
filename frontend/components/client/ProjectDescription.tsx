@@ -18,7 +18,7 @@ export default function ProjectDescription() {
     };
 
     return (
-        <section id="project-description" className="section bg-black">
+        <section id="project-description" className="section bg-black min-h-screen flex flex-col justify-center">
             <div className="container-custom">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}

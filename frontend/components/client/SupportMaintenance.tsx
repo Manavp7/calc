@@ -8,7 +8,7 @@ export default function SupportMaintenance() {
     const { inputs, setSupportDuration, calculateResults } = usePricingStore();
 
     return (
-        <section className="section bg-gradient-to-b from-gray-900 to-black">
+        <section className="section bg-gradient-to-b from-gray-900 to-black min-h-screen flex flex-col justify-center">
             <div className="container-custom">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}

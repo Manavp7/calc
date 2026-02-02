@@ -9,7 +9,7 @@ export default function FunctionalNeeds() {
     const { inputs, toggleFeature } = usePricingStore();
 
     return (
-        <section className="section bg-[#030712] relative py-20">
+        <section className="section bg-[#030712] relative py-20 min-h-screen flex flex-col justify-center">
             <div className="container-custom">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

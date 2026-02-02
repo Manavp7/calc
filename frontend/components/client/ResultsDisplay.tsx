@@ -163,7 +163,7 @@ export default function ResultsDisplay() {
     };
 
     return (
-        <section ref={sectionRef} id="results" className="section bg-gradient-to-b from-black via-gray-900 to-black relative">
+        <section ref={sectionRef} id="results" className="section bg-gradient-to-b from-black via-gray-900 to-black relative min-h-screen flex flex-col justify-center">
             <div className="container-custom">
                 <div ref={containerRef} className="opacity-0">
                     {/* Main Price */}

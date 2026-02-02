@@ -9,7 +9,7 @@ export default function IdeaDefinition() {
     const { inputs, setIdeaType } = usePricingStore();
 
     return (
-        <section id="idea-definition" className="section relative py-20 overflow-hidden">
+        <section id="idea-definition" className="section relative py-20 overflow-hidden min-h-screen flex flex-col justify-center">
             {/* Deep Ambient Background */}
             <div className="absolute inset-0 bg-[#030712]">
                 <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />

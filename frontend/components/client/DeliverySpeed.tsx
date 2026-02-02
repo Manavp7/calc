@@ -29,7 +29,7 @@ export default function DeliverySpeed() {
     const activeColor = getColor(sliderValue);
 
     return (
-        <section className="section bg-[#030712] relative py-20 overflow-hidden">
+        <section className="section bg-[#030712] relative py-20 overflow-hidden min-h-screen flex flex-col justify-center">
             {/* Background Pulse */}
             <motion.div
                 animate={{
