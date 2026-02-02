@@ -103,78 +103,48 @@ export default function Home() {
             {flowMode === 'manual' && (
                 <>
                     {/* Project Description */}
-                    <ScrollReveal direction="up" delay={0.1}>
-                        <ParallaxSection speed={-0.3}>
-                            <ProjectDescription />
-                        </ParallaxSection>
-                    </ScrollReveal>
+                    <ProjectDescription />
 
                     {/* Idea Definition */}
-                    <ScrollReveal direction="up" delay={0.1}>
-                        <ParallaxSection speed={-0.3}>
-                            <IdeaDefinition />
-                        </ParallaxSection>
-                    </ScrollReveal>
+                    <IdeaDefinition />
 
                     {/* Product Format */}
-                    <ScrollReveal direction="up" delay={0.1}>
-                        <ParallaxSection speed={-0.2}>
-                            <ProductFormat />
-                        </ParallaxSection>
-                    </ScrollReveal>
+                    <ProductFormat />
 
                     {/* Technology Preference */}
-                    <ScrollReveal direction="up" delay={0.1}>
-                        <ParallaxSection speed={-0.3}>
-                            <TechnologyPreference />
-                        </ParallaxSection>
-                    </ScrollReveal>
+                    <TechnologyPreference />
 
                     {/* Functional Needs */}
-                    <ScrollReveal direction="up" delay={0.1}>
-                        <FunctionalNeeds />
-                    </ScrollReveal>
+                    <FunctionalNeeds />
 
                     {/* Delivery Speed */}
-                    <ScrollReveal direction="up" delay={0.1}>
-                        <ParallaxSection speed={-0.3}>
-                            <DeliverySpeed />
-                        </ParallaxSection>
-                    </ScrollReveal>
+                    <DeliverySpeed />
 
                     {/* Support & Maintenance */}
-                    <ScrollReveal direction="up" delay={0.1}>
-                        <ParallaxSection speed={-0.2}>
-                            <SupportMaintenance />
-                        </ParallaxSection>
-                    </ScrollReveal>
+                    <SupportMaintenance />
                 </>
             )}
 
             {/* Results - Shown for both flows */}
             {(flowMode === 'manual' || (flowMode === 'ai' && !showAIReview)) && (
                 <div ref={resultsRef}>
-                    <ScrollReveal direction="up" delay={0.2}>
-                        <ResultsDisplay />
-                    </ScrollReveal>
+                    <ResultsDisplay />
                 </div>
             )}
 
             {/* Footer - Only shown when active */}
             {flowMode !== 'none' && (
-                <ScrollReveal direction="up" delay={0.1}>
-                    <footer className="bg-black border-t border-white/10 py-12">
-                        <div className="container-custom text-center">
-                            <p className="text-gray-400">
-                                © 2026 Pricing Calculator. Built with precision and transparency.
-                            </p>
-                            <div className="mt-4 flex justify-center gap-6 text-sm text-gray-500">
-                                <a href="#" className="hover:text-primary-400 transition-colors">Privacy Policy</a>
-                                <a href="#" className="hover:text-primary-400 transition-colors">Terms of Service</a>
-                            </div>
+                <footer className="bg-black border-t border-white/10 py-12">
+                    <div className="container-custom text-center">
+                        <p className="text-gray-400">
+                            © 2026 Pricing Calculator. Built with precision and transparency.
+                        </p>
+                        <div className="mt-4 flex justify-center gap-6 text-sm text-gray-500">
+                            <a href="#" className="hover:text-primary-400 transition-colors">Privacy Policy</a>
+                            <a href="#" className="hover:text-primary-400 transition-colors">Terms of Service</a>
                         </div>
-                    </footer>
-                </ScrollReveal>
+                    </div>
+                </footer>
             )}
         </main>
     );
