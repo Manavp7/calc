@@ -245,8 +245,8 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                 </div>
                             </div>
 
-                            {/* Timeline Visualization (Gantt) */}
-                            {timelineData && timelineData.phases.length > 0 && (
+                            {/* Timeline Visualization (Gantt) - Only show for client view */}
+                            {viewMode !== 'admin' && timelineData && timelineData.phases.length > 0 && (
                                 <div className="glass rounded-2xl p-6 mb-6">
                                     <div className="flex items-center gap-3 mb-6">
                                         <div className="p-2 bg-blue-500/10 rounded-lg">
