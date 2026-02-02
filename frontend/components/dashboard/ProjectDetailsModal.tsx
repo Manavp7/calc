@@ -97,6 +97,43 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
 
     const handleExport = () => {
         // Create mock data for PDF export
+        const inputs = fullProject.inputs;
+        const clientPrice = {
+            totalPrice: displayProfit.clientPrice,
+            priceRange: {
+                min: fullProject.clientPrice.min,
+                max: fullProject.clientPrice.max,
+            },
+            basePrice: 0,
+            featuresCost: 0,
+            techMultiplier: 1,
+            complexityMultiplier: 1,
+            timelineMultiplier: 1,
+            supportCost: 0,
+        };
+
+        // Recalculate timeline to ensure consistency with the latest engine logic
+        // This fixes the "3 weeks vs 6 weeks" discrepancy for older saved projects
+        let timeline: Timeline | null = timelineData;
+        try {
+            // We use the displayCost which is already verified/recalculated if needed
+            timeline = calculateTimeline(inputs, displayCost);
+        } catch (e) {
+            console.warn("Could not recalculate timeline for PDF, falling back to stored data", e);
+        }
+
+        // Final fallback if both recalculation fails AND timelineData was null
+        if (!timeline) {
+            timeline = {
+                totalWeeks: fullProject.clientPrice.timeline || 0,
+                teamSize: {
+                    min: fullProject.clientPrice.teamSizeMin || 1,
+                    max: fullProject.clientPrice.teamSizeMax || 1,
+                },
+                phases: [],
+            };
+        }
+
         // Merge root-level client details into inputs for the PDF
         const pdfInputs = {
             ...inputs,
@@ -111,25 +148,29 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                 label: 'Labor',
                 description: 'Development & Engineering',
                 percentage: Math.round((displayCost.totalLaborCost / displayCost.totalCost) * 100),
-                amount: displayCost.totalLaborCost
+                amount: displayCost.totalLaborCost,
+                color: '#3B82F6'
             },
             {
                 label: 'Infrastructure',
                 description: 'Server & Hosting Setup',
                 percentage: Math.round((displayCost.infrastructureCost / displayCost.totalCost) * 100),
-                amount: displayCost.infrastructureCost
+                amount: displayCost.infrastructureCost,
+                color: '#10B981'
             },
             {
                 label: 'Overhead',
                 description: 'Management & Tools',
                 percentage: Math.round((displayCost.overheadCost / displayCost.totalCost) * 100),
-                amount: displayCost.overheadCost
+                amount: displayCost.overheadCost,
+                color: '#F59E0B'
             },
             {
                 label: 'Risk Buffer',
                 description: 'Contingency Fund',
                 percentage: Math.round((displayCost.riskBuffer / displayCost.totalCost) * 100),
-                amount: displayCost.riskBuffer
+                amount: displayCost.riskBuffer,
+                color: '#EF4444'
             }
         ];
 
