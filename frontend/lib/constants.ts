@@ -250,14 +250,14 @@ export const CLIENT_COST_CATEGORIES = [
 
 // Hourly Rates
 export const HOURLY_RATES = {
-    frontend: 35, // Product Engineering
-    backend: 35,  // Business Logic
-    designer: 35, // UI/UX Design
-    qa: 25,       // Quality Assurance
-    pm: 45,       // Project Management
+    frontend: 85,
+    backend: 95,
+    designer: 75,
+    qa: 65,
+    pm: 100,
 };
 
-export const DEFAULT_CLIENT_HOURLY_RATE = 40; // Updated to match user's explicit rates ($35-$45 range)
+export const DEFAULT_CLIENT_HOURLY_RATE = 180; // Updated to maintain margin with new internal rates
 
 // Overhead & Risk
 export const OVERHEAD_PERCENTAGE = 0.15; // 15%

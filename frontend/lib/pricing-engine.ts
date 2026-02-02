@@ -89,6 +89,26 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
     const speedMultiplier = config.timelineMultipliers[inputs.deliverySpeed] || 1.0;
     const deliveryAdjustment = speedMultiplier > 1 ? 1.2 : 1.0; // 20% more hours for faster delivery
 
+    // Calculate Complexity Multiplier
+    // Used to scale both Rate (difficulty) and Hours (team size/effort)
+    let complexityMultiplier = getComplexityMultiplier(inputs.selectedFeatures.length);
+    if (inputs.complexityLevel) {
+        // Use the explicit level if set, or just the feature count logic
+        const levelMultiplier = config.complexityMultipliers[inputs.complexityLevel];
+        // Take the higher of the two to be safe, or just multiply them? 
+        // Let's take the higher one to represent the overall project strain.
+        complexityMultiplier = Math.max(complexityMultiplier, levelMultiplier);
+    }
+
+    // Determine multipliers
+    // "if more hard number of people working can be increased" -> Scale Hours
+    const hoursComplexityMultiplier = complexityMultiplier;
+
+    // "if more hard then more rate" -> Scale Rate
+    // We dampen the rate multiplier slightly so it doesn't balloon too crazily (e.g. 1.5x rate AND 1.5x hours = 2.25x cost)
+    // But user asked for it. "if more hard then more rate". Let's use the full multiplier.
+    const rateComplexityMultiplier = complexityMultiplier;
+
     // Calculate labor costs per role
     // Fallback to constants if config version missing (migration safety)
     const rates = config.hourlyRates || HOURLY_RATES;
@@ -96,32 +116,32 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
     const laborCosts: RoleCost[] = [
         {
             role: 'frontend',
-            hours: Math.round(totalHours.frontend * formatMultiplier * deliveryAdjustment),
-            hourlyRate: rates.frontend,
+            hours: Math.round(totalHours.frontend * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hourlyRate: Math.round(rates.frontend * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'backend',
-            hours: Math.round(totalHours.backend * formatMultiplier * deliveryAdjustment),
-            hourlyRate: rates.backend,
+            hours: Math.round(totalHours.backend * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hourlyRate: Math.round(rates.backend * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'designer',
-            hours: Math.round(totalHours.designer * formatMultiplier * deliveryAdjustment),
-            hourlyRate: rates.designer,
+            hours: Math.round(totalHours.designer * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hourlyRate: Math.round(rates.designer * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'qa',
-            hours: Math.round(totalHours.qa * formatMultiplier * deliveryAdjustment),
-            hourlyRate: rates.qa,
+            hours: Math.round(totalHours.qa * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hourlyRate: Math.round(rates.qa * rateComplexityMultiplier),
             totalCost: 0,
         },
         {
             role: 'pm',
-            hours: Math.round(totalHours.pm * formatMultiplier * deliveryAdjustment),
-            hourlyRate: rates.pm,
+            hours: Math.round(totalHours.pm * formatMultiplier * deliveryAdjustment * hoursComplexityMultiplier),
+            hourlyRate: Math.round(rates.pm * rateComplexityMultiplier),
             totalCost: 0,
         },
     ];
@@ -134,9 +154,6 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
     const totalLaborCost = laborCosts.reduce((sum, role) => sum + role.totalCost, 0);
 
     // Infrastructure cost (estimate 6 months average)
-    // TODO: Make infrastructure costs dynamic in config if needed, currently using constant map but could use config.
-    // For now we use the constant as it wasn't explicitly in the plan to move generic infra costs to config,
-    // although `PricingConfiguration` has `infrastructureCosts`. Let's use it.
     const infraCostMonthly = config.infrastructureCosts ? config.infrastructureCosts[inputs.ideaType] : INFRASTRUCTURE_COSTS[inputs.ideaType];
     const infrastructureCost = infraCostMonthly * 6;
 
