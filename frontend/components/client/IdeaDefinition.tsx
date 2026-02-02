@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { usePricingStore } from '@/lib/store';
 import { IDEA_TYPES } from '@/lib/constants';
+import { IdeaType } from '@/lib/types';
 import { Check, Sparkles } from 'lucide-react';
 
 export default function IdeaDefinition() {
@@ -42,7 +43,7 @@ export default function IdeaDefinition() {
                         return (
                             <motion.button
                                 key={idea.id}
-                                onClick={() => setIdeaType(idea.id)}
+                                onClick={() => setIdeaType(idea.id as IdeaType)}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, margin: "50px" }}
