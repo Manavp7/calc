@@ -91,15 +91,17 @@ export default function ResultsDisplay() {
         if (!clientPrice || !timeline) return;
         try {
             // Calculate actual internal costs using the pricing engine
-            const internalCost = calculateInternalCost(inputs);
+            // Use getState() to ensure we have the absolute latest inputs (including just-set lead info)
+            const currentInputs = usePricingStore.getState().inputs;
+            const internalCost = calculateInternalCost(currentInputs);
             const profitAnalysis = calculateProfit(clientPrice, internalCost);
 
             const projectData = {
-                clientName: inputs.clientName,
-                companyName: inputs.companyName,
-                clientEmail: inputs.email,
-                clientPhone: inputs.phone,
-                inputs,
+                clientName: currentInputs.clientName,
+                companyName: currentInputs.companyName,
+                clientEmail: currentInputs.email,
+                clientPhone: currentInputs.phone,
+                inputs: currentInputs,
                 clientPrice: {
                     min: clientPrice.priceRange.min,
                     max: clientPrice.priceRange.max,

@@ -127,7 +127,7 @@ export default function CompanyHeadDashboard() {
                     <div>
                         <h1 className="text-5xl font-bold gradient-text mb-2 tracking-tight">Command Center</h1>
                         <p className="text-gray-400 text-lg">
-                            Welcome back, <span className="text-white font-semibold">{session?.user?.name || 'Chief'}</span>
+                            Welcome back, <span className="text-white font-semibold">{(session?.user?.name === 'Admin' ? 'Company Head' : session?.user?.name) || 'Chief'}</span>
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
