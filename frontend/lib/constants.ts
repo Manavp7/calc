@@ -27,9 +27,8 @@ export const IDEA_TYPES = [
         icon: '💡',
     },
     {
-        id: 'enterprise software' as IdeaType,
         title: 'Enterprise Software',
-        description: 'Large-scale business solution',
+        description: 'Large scale business solution',
         icon: '🏢',
     },
     {
