@@ -12,8 +12,6 @@ import FunctionalNeeds from '@/components/client/FunctionalNeeds';
 import DeliverySpeed from '@/components/client/DeliverySpeed';
 import SupportMaintenance from '@/components/client/SupportMaintenance';
 import ResultsDisplay from '@/components/client/ResultsDisplay';
-import ScrollReveal from '@/components/client/ScrollReveal';
-import ParallaxSection from '@/components/client/ParallaxSection';
 import { usePricingStore } from '@/lib/store';
 import { AIAnalysis } from '@/lib/ai-types';
 
