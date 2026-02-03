@@ -314,18 +314,18 @@ export const BASE_IDEA_HOURS: Record<IdeaType, {
         pm: 30,
     },
     'website-mobile-app': {
-        frontend: 200,
-        backend: 120,
-        designer: 120,
-        qa: 80,
+        frontend: 230,
+        backend: 150,
+        designer: 130,
+        qa: 90,
         pm: 50,
     },
     'startup-product': {
-        frontend: 180,
-        backend: 150,
-        designer: 100,
-        qa: 80,
-        pm: 60,
+        frontend: 220,
+        backend: 170,
+        designer: 120,
+        qa: 90,
+        pm: 50,
     },
     'enterprise software': {
         frontend: 300,
@@ -335,11 +335,11 @@ export const BASE_IDEA_HOURS: Record<IdeaType, {
         pm: 120,
     },
     'ai-powered-product': {
-        frontend: 200,
-        backend: 250,
-        designer: 120,
-        qa: 120,
-        pm: 80,
+        frontend: 120,
+        backend: 180,
+        designer: 80,
+        qa: 80,
+        pm: 40,
     },
 };
 
@@ -361,25 +361,25 @@ export const TECH_MULTIPLIERS: Record<TechStack, number> = {
 export const FORMAT_MULTIPLIERS: Record<ProductFormat, number> = {
     'website': 1.0,
     'mobile-app': 1.2,
-    'website-and-app': 1.8,
+    'website-and-app': 1.6,
     'full-ecosystem': 2.2,
 };
 
 // Explicit complexity multipliers from AI analysis
 export const AI_COMPLEXITY_MULTIPLIERS = {
     'basic': 1.0,
-    'medium': 1.25,
-    'advanced': 1.6,
+    'medium': 1.15,
+    'advanced': 1.35,
 };
 
 // Infrastructure costs (monthly, will be calculated for project duration)
 export const INFRASTRUCTURE_COSTS: Record<IdeaType, number> = {
     'business-website': 100,
-    'mobile-app': 200,
-    'website-mobile-app': 300,
-    'startup-product': 500,
+    'mobile-app': 150,
+    'website-mobile-app': 250,
+    'startup-product': 400,
     'enterprise software': 2000,
-    'ai-powered-product': 1500,
+    'ai-powered-product': 600,
 };
 
 // Risk buffer based on complexity

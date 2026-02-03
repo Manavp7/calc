@@ -337,7 +337,7 @@ export const SUPPORT_COSTS: Record<SupportDuration, number> = {
 
 export const SUPPORT_HOURS: Record<SupportDuration, number> = {
     'none': 0,
-    '3-months': 15,
-    '6-months': 20,
-    '12-months': 25,
+    '3-months': 10,
+    '6-months': 15,
+    '12-months': 20,
 };
