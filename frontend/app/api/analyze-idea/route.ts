@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { AIAnalysis } from '@/lib/ai-types';
 
-const SYSTEM_PROMPT = `You are a world-class software architect and product strategist. Your task is to deeply analyze project ideas and extract structured, high-quality requirements, while providing strategic technical advice.
+const SYSTEM_PROMPT = `You are a world-class software architect and product strategist. Your task is to deeply analyze project ideas and extract structured, high-quality requirements.
+
 You have access to a paid, high-performance API, so be thorough and detailed.
 
 You must return ONLY valid JSON with no additional text.
@@ -45,7 +46,7 @@ Rules:
 - All fields are required
 - Use lowercase for enum values
 - Infer complexity from feature count and description
-- Be generous with feature detection; if a user hints at something, include the relevant feature.
+- **CRITICAL**: Be Strict with 'project_type'. ONLY select 'web_and_app' if the user EXPLICITLY asks for both. If they say "website" or "platform", assume 'website'. If they say "app", check context (web app vs mobile app).
 - Accurately assess risk and complexity based on the implied scope.
 - Provide high-value, specific strategic insights in the 'strategic_insights' field.
 - Suggest a modern, scalable 'recommended_stack'.
@@ -152,9 +153,9 @@ export async function POST(request: NextRequest) {
             if (!process.env.GEMINI_API_KEY) throw new Error('No API Key');
 
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            // Using gemini-2.0-flash as requested for latest capabilities
+            // Using gemini-1.5-pro for maximum reasoning capability
             const model = genAI.getGenerativeModel({
-                model: "gemini-2.0-flash",
+                model: "gemini-1.5-pro",
                 generationConfig: { responseMimeType: "application/json" }
             });
 
