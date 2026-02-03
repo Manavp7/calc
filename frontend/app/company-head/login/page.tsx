@@ -174,9 +174,9 @@ export default function LoginPage() {
                         <p className="text-xs text-gray-400 mb-2">Demo Credentials:</p>
                         <div className="space-y-1 text-xs">
                             <p className="text-gray-300">
-                                <span className="text-primary-400">Admin:</span> admin@demo.com / admin123
+                                <span className="text-primary-400">Admin:</span> admin@example.com / admin123
                                 <br />
-                                <span className="text-primary-400">Company Head:</span> head@demo.com / head123
+                                <span className="text-primary-400">Company Head:</span> head@example.com / head123
                             </p>
                         </div>
                     </div>

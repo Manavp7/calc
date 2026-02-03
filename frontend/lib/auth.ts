@@ -2,6 +2,9 @@ import { getServerSession } from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
 import type { UserRole } from '@/types/next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { dbConnect } from '@/lib/db';
+import { User } from '@/lib/models';
+import bcrypt from 'bcryptjs';
 
 
 export const authOptions: NextAuthOptions = {
@@ -17,42 +20,45 @@ export const authOptions: NextAuthOptions = {
                     console.log('🔐 [Auth] Starting authorization for:', credentials?.email);
 
                     if (!credentials?.email || !credentials?.password) {
-                        throw new Error('Missing credentials');
+                        return null;
                     }
 
-                    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-                    console.log(`📡 [Auth] Connecting to backend at ${backendUrl}...`);
+                    await dbConnect();
 
-                    const res = await fetch(`${backendUrl}/api/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: credentials.email,
-                            password: credentials.password,
-                        }),
-                    });
+                    // Case-insensitive email search
+                    const email = credentials.email.toLowerCase();
+                    const user = await User.findOne({ email });
 
-                    const text = await res.text();
-                    console.log('📡 [Auth] Response status:', res.status);
-
-                    let user;
-                    try {
-                        user = text ? JSON.parse(text) : {};
-                    } catch (e) {
-                        console.error('❌ [Auth] Failed to parse backend response:', text);
-                        throw new Error(`Backend error: ${res.status} ${res.statusText}`);
+                    if (!user) {
+                        console.log('❌ [Auth] User not found:', email);
+                        return null;
                     }
 
-                    if (!res.ok) {
-                        console.log('❌ [Auth] Backend rejected login:', user.message || text);
-                        throw new Error(user.message || 'Login failed');
+                    // Check password
+                    // Try bcrypt first
+                    let isValid = await bcrypt.compare(credentials.password, user.password);
+
+                    // Fallback for plain text passwords (legacy/demo data)
+                    if (!isValid && user.password === credentials.password) {
+                        console.log('⚠️ [Auth] Allowing plain text password match for:', email);
+                        isValid = true;
                     }
 
-                    console.log('✅ [Auth] Authorization successful');
-                    return user;
+                    if (!isValid) {
+                        console.log('❌ [Auth] Invalid password for:', email);
+                        return null;
+                    }
+
+                    console.log('✅ [Auth] Authorization successful for:', email);
+                    return {
+                        id: user._id.toString(),
+                        email: user.email,
+                        name: user.name,
+                        role: user.role,
+                    };
                 } catch (error) {
                     console.error('🚨 [Auth] Authorization error:', error);
-                    throw error;
+                    return null;
                 }
             },
         }),
