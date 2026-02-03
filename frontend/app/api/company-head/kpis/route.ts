@@ -9,25 +9,26 @@ export async function GET() {
     try {
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
-        // 1. Fetch all raw projects from backend provided API
-        const res = await fetch(`${backendUrl}/api/projects`, { cache: 'no-store' });
+        // 1. Parallelize Fetching: Get Projects + Active Users simultaneously
+        const [projectsRes, activeUsers] = await Promise.all([
+            fetch(`${backendUrl}/api/projects`, { cache: 'no-store' }),
+            (async () => {
+                try {
+                    await dbConnect();
+                    return await User.countDocuments();
+                } catch (dbError) {
+                    console.error('Error counting users:', dbError);
+                    return 0;
+                }
+            })()
+        ]);
 
         let projects = [];
-        if (res.ok) {
-            const data = await res.json();
+        if (projectsRes.ok) {
+            const data = await projectsRes.json();
             projects = data.projects || [];
         } else {
             console.error('Failed to fetch projects from backend');
-        }
-
-        // 2. Fetch Active Users Count directly from DB (since backend KPI doesn't include it yet)
-        let activeUsers = 0;
-        try {
-            await dbConnect();
-            activeUsers = await User.countDocuments();
-        } catch (dbError) {
-            console.error('Error counting users:', dbError);
-            // Fallback to 0 if db connection fails
         }
 
         // 3. Recalculate KPIs using current engine logic

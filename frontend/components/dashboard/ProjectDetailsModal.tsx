@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, TrendingUp, DollarSign, Users, Calendar, Mail, Phone, Building, Layers } from 'lucide-react';
 import { generatePricingPDF } from '@/lib/pdf-export';
 import { useEffect, useState } from 'react';
-import { calculateInternalCost, calculateProfit, calculateTimeline } from '@/lib/pricing-engine';
+import { calculateInternalCost, calculateProfit, calculateTimeline, calculateClientPrice } from '@/lib/pricing-engine';
 import GanttChart from '@/components/client/GanttChart';
 import { IdeaType, ProductFormat, DeliverySpeed, SupportDuration, TechStack, Timeline, RoleCost } from '@/lib/types';
 import { ROLE_LABELS } from '@/lib/constants';
@@ -86,8 +86,8 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
         }
     }
 
-    // specific timeline object reconstruction for GanttChart
-    const timelineData: Timeline | null = fullProject.timelineDetails ? {
+    // Reconstruct timeline data - try stored first, then recalculate if missing
+    let displayTimeline: Timeline | null = fullProject.timelineDetails ? {
         totalWeeks: fullProject.timelineDetails.totalWeeks,
         phases: fullProject.timelineDetails.phases,
         teamSize: {
@@ -96,22 +96,47 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
         }
     } : null;
 
+    // fix: if stored timeline/teamsize is missing/zero, calculate it now
+    if (!displayTimeline || !displayTimeline.teamSize.max || !displayTimeline.totalWeeks) {
+        try {
+            displayTimeline = calculateTimeline(fullProject.inputs, displayCost);
+        } catch (err) {
+            console.error("Failed to calculate timeline", err);
+            // Fallback for types
+            displayTimeline = {
+                phases: [],
+                totalWeeks: 0,
+                teamSize: { min: 0, max: 0 }
+            };
+        }
+    }
+
+    const timelineData = displayTimeline; // Keep variable name for GanttChart below
+
     const handleExport = () => {
         // Create mock data for PDF export
         const inputs = fullProject.inputs;
-        const clientPrice = {
-            totalPrice: displayProfit.clientPrice,
-            priceRange: {
-                min: fullProject.clientPrice.min,
-                max: fullProject.clientPrice.max,
-            },
-            basePrice: 0,
-            featuresCost: 0,
-            techMultiplier: 1,
-            complexityMultiplier: 1,
-            timelineMultiplier: 1,
-            supportCost: 0,
-        };
+
+        let clientPrice;
+        try {
+            // Recalculate client price to ensure fresh data (fixes 0-0 range issue)
+            clientPrice = calculateClientPrice(inputs);
+        } catch (e) {
+            console.warn("Could not recalculate client price, using stored data", e);
+            clientPrice = {
+                totalPrice: displayProfit.clientPrice,
+                priceRange: {
+                    min: fullProject.clientPrice.min,
+                    max: fullProject.clientPrice.max,
+                },
+                basePrice: 0,
+                featuresCost: 0,
+                techMultiplier: 1,
+                complexityMultiplier: 1,
+                timelineMultiplier: 1,
+                supportCost: 0,
+            };
+        }
 
         // Recalculate timeline to ensure consistency with the latest engine logic
         // This fixes the "3 weeks vs 6 weeks" discrepancy for older saved projects
@@ -294,7 +319,7 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                         <p className="text-sm text-gray-400">Team Size</p>
                                     </div>
                                     <p className="text-2xl font-bold">
-                                        {fullProject.clientPrice.teamSizeMin}-{fullProject.clientPrice.teamSizeMax}
+                                        {displayTimeline?.teamSize.min}-{displayTimeline?.teamSize.max} <span className="text-sm font-normal text-gray-400">members</span>
                                     </p>
                                 </div>
 
@@ -304,7 +329,7 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                         <p className="text-sm text-gray-400">Timeline</p>
                                     </div>
                                     <p className="text-2xl font-bold">
-                                        {fullProject.clientPrice.timeline} weeks
+                                        {displayTimeline?.totalWeeks} weeks
                                     </p>
                                 </div>
                             </div>
@@ -360,39 +385,6 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                     </div>
                                 </div>
 
-                                {/* Detailed Labor Breakdown (Internal Only) */}
-                                {(viewMode === 'admin' || viewMode === 'internal') && displayCost.laborCosts && (
-                                    <div className="glass rounded-2xl p-6 lg:col-span-2">
-                                        <h3 className="text-xl font-bold mb-4">Detailed Labor Allocation</h3>
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-left">
-                                                <thead>
-                                                    <tr className="border-b border-white/10 text-gray-500 text-sm">
-                                                        <th className="pb-3 text-left">Role</th>
-                                                        <th className="pb-3 text-right">Hours</th>
-                                                        <th className="pb-3 text-right">Rate</th>
-                                                        <th className="pb-3 text-right">Cost</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-white/5">
-                                                    {displayCost.laborCosts.map((role: any) => (
-                                                        <tr key={role.role} className="group hover:bg-white/5 transition-colors">
-                                                            <td className="py-3 text-white font-medium">
-                                                                {ROLE_LABELS?.[role.role] || role.role.replace(/-/g, ' ')}
-                                                            </td>
-                                                            <td className="py-3 text-right text-gray-400">{role.hours}h</td>
-                                                            <td className="py-3 text-right text-gray-400">${role.hourlyRate}/hr</td>
-                                                            <td className="py-3 text-right text-white font-mono">
-                                                                ${role.totalCost.toLocaleString()}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-
                                 {/* Profit Analysis */}
                                 <div className="glass rounded-2xl p-6 flex flex-col">
                                     <h3 className="text-xl font-bold mb-4 shrink-0">Profit Analysis</h3>
@@ -427,6 +419,39 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Detailed Labor Breakdown (Internal Only) */}
+                                {(viewMode === 'admin' || viewMode === 'internal') && displayCost.laborCosts && (
+                                    <div className="glass rounded-2xl p-6 lg:col-span-2">
+                                        <h3 className="text-xl font-bold mb-4">Detailed Labor Allocation</h3>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left">
+                                                <thead>
+                                                    <tr className="border-b border-white/10 text-gray-500 text-sm">
+                                                        <th className="pb-3 text-left">Role</th>
+                                                        <th className="pb-3 text-right">Hours</th>
+                                                        <th className="pb-3 text-right">Rate</th>
+                                                        <th className="pb-3 text-right">Cost</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-white/5">
+                                                    {displayCost.laborCosts.map((role: any) => (
+                                                        <tr key={role.role} className="group hover:bg-white/5 transition-colors">
+                                                            <td className="py-3 text-white font-medium">
+                                                                {ROLE_LABELS?.[role.role] || role.role.replace(/-/g, ' ')}
+                                                            </td>
+                                                            <td className="py-3 text-right text-gray-400">{role.hours}h</td>
+                                                            <td className="py-3 text-right text-gray-400">${role.hourlyRate}/hr</td>
+                                                            <td className="py-3 text-right text-white font-mono">
+                                                                ${role.totalCost.toLocaleString()}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Project Details Footer */}

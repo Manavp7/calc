@@ -24,20 +24,20 @@ export function generatePricingPDF(
 
     // Header
     doc.setFillColor(...primaryColor);
-    doc.rect(0, 0, 210, 40, 'F');
+    doc.rect(0, 0, 210, 60, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.text('Project Estimate', 105, 25, { align: 'center' });
-    doc.setFontSize(12);
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'normal');
-    doc.text(new Date().toLocaleDateString(), 105, 33, { align: 'center' });
+    doc.text(new Date().toLocaleDateString(), 105, 36, { align: 'center' });
 
     // Client Details (Sub-header)
-    doc.setFontSize(10);
-    doc.setTextColor(200, 200, 200); // Light gray for details on dark background
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255); // White for better contrast
 
-    let subHeaderY = 38;
+    let subHeaderY = 46;
     const clientInfo = [
         inputs.clientName || 'Valued Client',
         inputs.companyName,
@@ -47,10 +47,10 @@ export function generatePricingPDF(
 
     // Check if text fits or needs wrapping (simple check)
     if (clientInfo.length > 0) {
-        doc.text(clientInfo, 105, 38, { align: 'center' });
+        doc.text(clientInfo, 105, subHeaderY, { align: 'center' });
     }
 
-    yPos = 55;
+    yPos = 75;
 
     // Main Price Section
     doc.setFillColor(240, 249, 255); // light blue bg
@@ -68,8 +68,11 @@ export function generatePricingPDF(
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...grayText);
+    const minPrice = clientPrice.priceRange?.min ?? 0;
+    const maxPrice = clientPrice.priceRange?.max ?? 0;
+
     doc.text(
-        `Range: $${clientPrice.priceRange.min.toLocaleString()} - $${clientPrice.priceRange.max.toLocaleString()}`,
+        `Range: $${minPrice.toLocaleString()} - $${maxPrice.toLocaleString()}`,
         105,
         yPos + 38,
         { align: 'center' }

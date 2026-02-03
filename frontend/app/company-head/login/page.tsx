@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
@@ -19,6 +19,9 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
+            // Ensure any existing session is cleared before new login
+            await signOut({ redirect: false });
+
             const result = await signIn('credentials', {
                 email,
                 password,

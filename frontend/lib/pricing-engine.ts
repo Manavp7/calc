@@ -341,8 +341,17 @@ export function calculateTimeline(inputs: PricingInputs, internalCost: InternalC
     const totalHours = internalCost.laborCosts.reduce((sum, role) => sum + role.hours, 0);
 
     // Estimate team size (2-8 people typical)
-    const baseMin = Math.max(2, Math.ceil(inputs.selectedFeatures.length / 4));
-    const baseMax = Math.min(8, Math.ceil(inputs.selectedFeatures.length / 2) + 3);
+    let baseMin = Math.max(2, Math.ceil(inputs.selectedFeatures.length / 4));
+    let baseMax = Math.min(8, Math.ceil(inputs.selectedFeatures.length / 2) + 3);
+
+    // Dynamic Complexity Adjustment (User Request)
+    if (inputs.complexityLevel === 'advanced') {
+        baseMin += 2;
+        baseMax += 3;
+    } else if (inputs.complexityLevel === 'medium') {
+        baseMin += 1;
+        baseMax += 1;
+    }
 
     const teamSize = {
         min: Math.min(baseMin, baseMax),
