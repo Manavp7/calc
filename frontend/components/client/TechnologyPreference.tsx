@@ -22,7 +22,7 @@ export default function TechnologyPreference() {
                         <span className="text-white/20 text-xl ml-3 font-normal">(Optional)</span>
                     </h2>
                     <p className="text-slate-400 text-base max-w-xl mx-auto">
-                        Have a specific stack in mind? Select it below. If you're unsure, let our experts decide the best fit for you.
+                        Have a specific stack in mind? Select it below. If you&apos;re unsure, let our experts decide the best fit for you.
                     </p>
                 </motion.div>
 

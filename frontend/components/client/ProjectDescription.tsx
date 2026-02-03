@@ -96,7 +96,7 @@ export default function ProjectDescription() {
                             <div className="text-2xl mb-2">✨</div>
                             <h4 className="text-sm font-semibold text-white mb-1">Think Big</h4>
                             <p className="text-xs text-gray-400">
-                                Don't worry about technical details, just describe your idea
+                                Don&apos;t worry about technical details, just describe your idea
                             </p>
                         </div>
                     </motion.div>

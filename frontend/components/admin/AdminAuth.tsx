@@ -79,7 +79,7 @@ export default function AdminAuth({ onAuthenticated }: { onAuthenticated: () => 
 
                 <div className="mt-8 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
                     <p className="text-yellow-400 text-xs text-center">
-                        <strong>Demo:</strong> Default password is "pricing2026"
+                        <strong>Demo:</strong> Default password is &quot;pricing2026&quot;
                     </p>
                 </div>
             </motion.div>
