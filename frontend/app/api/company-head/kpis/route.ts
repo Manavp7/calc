@@ -1,35 +1,21 @@
 import { NextResponse } from 'next/server';
 import { calculateInternalCost, calculateClientPrice, calculateProfit } from '@/lib/pricing-engine';
 import { dbConnect } from '@/lib/db';
-import { User } from '@/lib/models';
+import { User, Project } from '@/lib/models';
 
 // GET - Fetch KPIs for company head dashboard
 // We recalculate these on-the-fly to ensure latest pricing formulas are applied to all stored projects
 export async function GET() {
     try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
-
         // 1. Parallelize Fetching: Get Projects + Active Users simultaneously
-        const [projectsRes, activeUsers] = await Promise.all([
-            fetch(`${backendUrl}/api/projects`, { cache: 'no-store' }),
-            (async () => {
-                try {
-                    await dbConnect();
-                    return await User.countDocuments();
-                } catch (dbError) {
-                    console.error('Error counting users:', dbError);
-                    return 0;
-                }
-            })()
-        ]);
+        await dbConnect();
 
-        let projects = [];
-        if (projectsRes.ok) {
-            const data = await projectsRes.json();
-            projects = data.projects || [];
-        } else {
-            console.error('Failed to fetch projects from backend');
-        }
+        const [projects, activeUsers] = await Promise.all([
+            // Fetch all projects directly from DB
+            Project.find({}).sort({ createdAt: -1 }).lean(),
+            // Count users
+            User.countDocuments()
+        ]);
 
         // 3. Recalculate KPIs using current engine logic
         const recalculatedProjects = projects.map((p: any) => {
