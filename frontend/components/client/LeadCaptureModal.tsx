@@ -156,7 +156,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                     name="clientName"
                                     value={formData.clientName}
                                     onChange={handleChange}
-                                    className={`w-full bg-white/5 border ${errors.clientName ? 'border-red-500' : 'border-white/10'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-600`}
+                                    className={`w-full bg-white/10 border ${errors.clientName ? 'border-red-500' : 'border-white/20'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-400`}
                                     placeholder="John Doe"
                                 />
                             </div>
@@ -172,7 +172,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                     name="companyName"
                                     value={formData.companyName}
                                     onChange={handleChange}
-                                    className={`w-full bg-white/5 border ${errors.companyName ? 'border-red-500' : 'border-white/10'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-600`}
+                                    className={`w-full bg-white/10 border ${errors.companyName ? 'border-red-500' : 'border-white/20'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-400`}
                                     placeholder="Acme Inc."
                                 />
                             </div>
@@ -188,7 +188,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className={`w-full bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-600`}
+                                    className={`w-full bg-white/10 border ${errors.email ? 'border-red-500' : 'border-white/20'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-400`}
                                     placeholder="john@example.com"
                                 />
                             </div>
@@ -202,7 +202,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                     <select
                                         value={formData.countryCode}
                                         onChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                                        className="w-full h-full bg-white/5 border border-white/10 rounded-xl px-3 text-white appearance-none focus:outline-none focus:border-primary-500 transition-colors cursor-pointer"
+                                        className="w-full h-full bg-white/10 border border-white/20 rounded-xl px-3 text-white appearance-none focus:outline-none focus:border-primary-500 transition-colors cursor-pointer"
                                     >
                                         {countryCodes.map((country) => (
                                             <option key={country.code} value={country.dial_code} className="bg-gray-900 text-white">
@@ -221,7 +221,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
-                                        className={`w-full bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-white/10'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-600`}
+                                        className={`w-full bg-white/10 border ${errors.phone ? 'border-red-500' : 'border-white/20'} rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary-500 transition-colors placeholder:text-gray-400`}
                                         placeholder="0000000000"
                                     />
                                 </div>
@@ -250,7 +250,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
                                     type="text"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                                    className={`w-full bg-white/5 border ${errors.otp ? 'border-red-500' : 'border-white/10'} rounded-xl py-3 pl-12 pr-12 text-white focus:outline-none focus:border-primary-500 transition-colors text-center tracking-widest text-2xl font-bold`}
+                                    className={`w-full bg-white/10 border ${errors.otp ? 'border-red-500' : 'border-white/20'} rounded-xl py-3 pl-12 pr-12 text-white focus:outline-none focus:border-primary-500 transition-colors text-center tracking-widest text-2xl font-bold placeholder:text-gray-400`}
                                     placeholder="000000"
                                     autoFocus
                                 />
