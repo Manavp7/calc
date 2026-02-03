@@ -24,15 +24,21 @@ export async function GET() {
             if (!p.inputs) return p;
 
             try {
-                const internalCost = calculateInternalCost(p.inputs as any);
-                const clientPrice = calculateClientPrice(p.inputs as any);
+                // Ensure inputs are compatible with CalculationInputs
+                const inputs = p.inputs;
+
+                // Recalculate using module-level default config (which has the new constants)
+                const internalCost = calculateInternalCost(inputs);
+                const clientPrice = calculateClientPrice(inputs);
                 const profitAnalysis = calculateProfit(clientPrice, internalCost);
 
                 return {
                     ...p,
                     internalCost,
-                    clientPrice,
-                    profitAnalysis
+                    clientPrice, // This now excludes support cost from totalPrice
+                    profitAnalysis,
+                    // If we want to show the support cost separately
+                    supportCost: clientPrice.supportCost,
                 };
             } catch (e) {
                 console.error(`Failed to recalculate project ${p._id}`, e);

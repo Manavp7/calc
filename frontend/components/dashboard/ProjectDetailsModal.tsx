@@ -161,12 +161,14 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
         }
 
         // Merge root-level client details into inputs for the PDF
+        // PRIVACY UPDATE: If downloading as client, hide personal contact details
+        const isClientView = viewMode === 'client';
         const pdfInputs = {
             ...inputs,
-            clientName: inputs.clientName || fullProject.clientName,
-            companyName: inputs.companyName || fullProject.companyName,
-            email: inputs.email || fullProject.clientEmail,
-            phone: inputs.phone || fullProject.clientPhone,
+            clientName: isClientView ? 'Valued Client' : (inputs.clientName || fullProject.clientName),
+            companyName: isClientView ? 'Confidential' : (inputs.companyName || fullProject.companyName),
+            email: isClientView ? '' : (inputs.email || fullProject.clientEmail),
+            phone: isClientView ? '' : (inputs.phone || fullProject.clientPhone),
         };
 
         const costBreakdown = [

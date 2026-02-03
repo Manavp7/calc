@@ -28,37 +28,37 @@ export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>(
 export interface IPricingConfig extends Document {
     version: number;
     isActive: boolean;
-    baseIdeaCosts: {
-        'business-website': number;
-        'mobile-app': number;
-        'website-mobile-app': number;
-        'startup-product': number;
-        'enterprise-software': number;
-        'ai-powered-product': number;
-    };
+    baseIdeaHours: Record<string, {
+        frontend: number;
+        backend: number;
+        designer: number;
+        qa: number;
+        pm: number;
+    }>;
     featureCosts: Record<string, number>;
-    techMultipliers: {
-        'react-nextjs': number;
-        'react-native': number;
-        'flutter': number;
-        'expert-choice': number;
-    };
+    techMultipliers: Record<string, number>;
+    formatMultipliers: Record<string, number>;
     complexityMultipliers: {
-        low: number;
+        basic: number;
         medium: number;
-        high: number;
+        advanced: number;
     };
-    timelineMultipliers: {
-        standard: number;
-        faster: number;
-        priority: number;
+    timelineMultipliers: Record<string, number>;
+    supportPackages: Record<string, number>;
+    featureBaseCost: number;
+    clientHourlyRate: number;
+    supportHours: Record<string, number>;
+    hourlyRates: {
+        frontend: number;
+        backend: number;
+        designer: number;
+        qa: number;
+        pm: number;
+        infrastructure: number;
+        security: number;
+        support: number;
     };
-    supportPricing: {
-        none: number;
-        '3-months': number;
-        '6-months': number;
-        '12-months': number;
-    };
+    infrastructureCosts: Record<string, number>;
     createdBy: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
@@ -67,37 +67,41 @@ export interface IPricingConfig extends Document {
 const PricingConfigSchema = new Schema<IPricingConfig>({
     version: { type: Number, required: true },
     isActive: { type: Boolean, default: false },
-    baseIdeaCosts: {
-        'business-website': { type: Number, required: true },
-        'mobile-app': { type: Number, required: true },
-        'website-mobile-app': { type: Number, required: true },
-        'startup-product': { type: Number, required: true },
-        'enterprise software': { type: Number, required: true },
-        'ai-powered-product': { type: Number, required: true },
+    baseIdeaHours: {
+        type: Map,
+        of: {
+            frontend: Number,
+            backend: Number,
+            designer: Number,
+            qa: Number,
+            pm: Number
+        },
+        required: true
     },
-    featureCosts: { type: Map, of: Number, required: true },
-    techMultipliers: {
-        'react-nextjs': { type: Number, required: true },
-        'react-native': { type: Number, required: true },
-        'flutter': { type: Number, required: true },
-        'expert-choice': { type: Number, required: true },
-    },
+    featureCosts: { type: Map, of: Number, default: {} },
+    techMultipliers: { type: Map, of: Number, required: true },
+    formatMultipliers: { type: Map, of: Number, required: true },
     complexityMultipliers: {
-        low: { type: Number, required: true },
+        basic: { type: Number, required: true },
         medium: { type: Number, required: true },
-        high: { type: Number, required: true },
+        advanced: { type: Number, required: true },
     },
-    timelineMultipliers: {
-        standard: { type: Number, required: true },
-        faster: { type: Number, required: true },
-        priority: { type: Number, required: true },
+    timelineMultipliers: { type: Map, of: Number, required: true },
+    supportPackages: { type: Map, of: Number, required: true },
+    featureBaseCost: { type: Number, default: 5000 },
+    clientHourlyRate: { type: Number, default: 120 },
+    supportHours: { type: Map, of: Number, required: true },
+    hourlyRates: {
+        frontend: { type: Number, required: true },
+        backend: { type: Number, required: true },
+        designer: { type: Number, required: true },
+        qa: { type: Number, required: true },
+        pm: { type: Number, required: true },
+        infrastructure: { type: Number, required: true },
+        security: { type: Number, required: true },
+        support: { type: Number, required: true },
     },
-    supportPricing: {
-        none: { type: Number, required: true },
-        '3-months': { type: Number, required: true },
-        '6-months': { type: Number, required: true },
-        '12-months': { type: Number, required: true },
-    },
+    infrastructureCosts: { type: Map, of: Number, required: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 
