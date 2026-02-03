@@ -14,6 +14,7 @@ const SYSTEM_PROMPT = `You are an **Expert Product Strategist**. Your goal is to
 2. **Enterprise Software** (Map to 'enterprise')
    - Internal business operations, dashboards, ERP, CRM.
    - Multi-user, role-based, B2B focus.
+   - **TIE-BREAKER**: If it looks like Enterprise Software (dashboards, workflows) BUT has AI features, classify as **Enterprise Software** with 'ai_features_required': true.
 
 3. **Startup Product** (Map to 'startup_product')
    - Early-stage MVP, market validation focus.
@@ -50,6 +51,10 @@ Return ONLY valid JSON.
 }
 
 ### FEW-SHOT EXAMPLES
+
+**Input:** "OpsPulse is a cloud-based enterprise operations platform with AI-driven anomaly detection."
+**Logic:** It has dashboards, workflows, and role-based access (Enterprise). AI is for alerts/insights, not the core function.
+**Result:** "project_type": "enterprise", "ai_features_required": true
 
 **Input:** "Web-based dashboard to manage sales & expenses with AI alerts."
 **Logic:** Internal tool + AI matches "Enterprise". AI is not core.
