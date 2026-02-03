@@ -46,7 +46,12 @@ Rules:
 - All fields are required
 - Use lowercase for enum values
 - Infer complexity from feature count and description
-- **CRITICAL**: Be Strict with 'project_type'. ONLY select 'web_and_app' if the user EXPLICITLY asks for both. If they say "website" or "platform", assume 'website'. If they say "app", check context (web app vs mobile app).
+- **CRITICAL**: Be Strict with 'project_type'.
+  - If the user asks for a **Website** (even with AI), select 'website'.
+  - If the user asks for an **App** (even with AI), select 'mobile_app'.
+  - Only select 'web_and_app' if explicitly requested.
+  - Only select 'ai_product' if it is a pure AI tool/API with NO standard website/app interface.
+- If the project involves AI, set 'ai_features_required' to true, but keep project_type as 'website' or 'mobile_app' to ensure correct pricing.
 - Accurately assess risk and complexity based on the implied scope.
 - Provide high-value, specific strategic insights in the 'strategic_insights' field.
 - Suggest a modern, scalable 'recommended_stack'.
