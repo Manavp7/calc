@@ -8,71 +8,63 @@ You have access to a paid, high-performance API, so be thorough and detailed.
 
 You must return ONLY valid JSON with no additional text.
 
-Required JSON structure:
+### CLIASSIFICATION RULES (STRICT)
+
+1. **Platform Classification**
+   - Classify the product into ONLY ONE platform type unless explicitly asked for multiple.
+   - Browser-based or Cloud-hosted -> **web**
+   - Mobile store release -> **android** / **ios**
+   - Do NOT infer "mobile_app" just because a site is "responsive".
+
+2. **AI Role Classification**
+   - **Core AI Product**: The product CANNOT function without AI (e.g., Midjourney, ChatGPT). Map to 'ai_product'.
+   - **AI-Enhanced Software**: The product works without AI, but AI adds value (e.g., Sales Dashboard with AI insights). Map to 'website' or 'mobile_app' with 'ai_features_required': true.
+   - **Non-AI Software**: No AI features.
+
+### FEW-SHOT TRAINING EXAMPLES
+
+✅ **Example 1 (AI-Enhanced Web App)**
+Input: "A web-based dashboard for sales tracking with AI-generated insights."
+Output Logic:
+- Platform: Web Application
+- AI Classification: AI-Enhanced (Not Core)
+- Result: "project_type": "website", "ai_features_required": true
+
+✅ **Example 2 (Core AI Product)**
+Input: "An LLM that generates legal contracts."
+Output Logic:
+- Platform: API/Web
+- AI Classification: Core AI
+- Result: "project_type": "ai_product", "ai_features_required": true
+
+✅ **Example 3 (Standard Web App)**
+Input: "A browser-based invoicing tool."
+Output Logic:
+- Platform: Web Application
+- AI Classification: Non-AI
+- Result: "project_type": "website", "ai_features_required": false
+
+### FINAL VALIDATION CHECK
+- ❓ Can the product work without AI? -> Yes -> Do NOT select 'ai_product'.
+- ❓ Is installation required on a phone? -> No -> Do NOT select 'mobile_app'.
+
+### REQUIRED JSON OUTPUT FORMAT
 {
   "project_type": "website | mobile_app | web_and_app | enterprise | ai_product",
   "platforms": ["web", "android", "ios"],
-  "idea_domain": "string (e.g., ecommerce, booking, education, fintech, health)",
-  "required_features": ["array of feature strings"],
+  "idea_domain": "string (e.g., fintech, health, ecommerce)",
+  "required_features": ["array of feature strings (snake_case)"],
   "complexity_level": "basic | medium | advanced",
-  "third_party_integrations": ["array of integrations"],
+  "third_party_integrations": ["array of strings"],
   "risk_level": "low | medium | high",
   "admin_panel_required": true/false,
   "ai_features_required": true/false,
-  "strategic_insights": "A detailed (2-3 paragraphs) strategic analysis. Explain WHY you chose the complexity/stack. Identify key challenges (technical or market). Suggest an MVP scope versus future features. Be like a CTO giving advice.",
-  "recommended_stack": ["array of specific technologies (e.g., 'Next.js', 'PostgreSQL', 'Stripe', 'AWS S3', 'Flutter')"]
+  "strategic_insights": "Detailed strategic analysis (2-3 paragraphs). Explain the classification logic used.",
+  "recommended_stack": ["Next.js", "React Native", "PostgreSQL", "etc"]
 }
 
-Feature strings should use snake_case and be from this list:
-- user_authentication
-- online_payments
-- booking_system
-- admin_dashboard
-- real_time_chat
-- ai_recommendations
-- push_notifications
-- social_login
-- analytics_dashboard
-- file_upload
-- search_functionality
-- geolocation
-- video_streaming
-- multi_language
-- email_notifications
-
-Rules:
-- Return ONLY the JSON object
-- No markdown, no explanations outside the JSON
-- All fields are required
-- Use lowercase for enum values
-- Infer complexity from feature count and description
-- **CRITICAL**: Be Strict with 'project_type'.
-  - If the user asks for a **Website** (even with AI), select 'website'.
-  - If the user asks for an **App** (even with AI), select 'mobile_app'.
-  - Only select 'web_and_app' if explicitly requested.
-  - Only select 'ai_product' if it is a pure AI tool/API with NO standard website/app interface.
-- If the project involves AI, set 'ai_features_required' to true, but keep project_type as 'website' or 'mobile_app' to ensure correct pricing.
-- Accurately assess risk and complexity based on the implied scope.
-- Provide high-value, specific strategic insights in the 'strategic_insights' field.
-- Suggest a modern, scalable 'recommended_stack'.
-
-Example Input:
-"I want a uber for dog walking where people can book walkers and track them."
-
-Example Output:
-{
-  "project_type": "mobile_app",
-  "platforms": ["android", "ios"],
-  "idea_domain": "on_demand_service",
-  "required_features": ["user_authentication", "booking_system", "geolocation", "real_time_chat", "online_payments", "push_notifications", "admin_dashboard"],
-  "complexity_level": "advanced",
-  "third_party_integrations": ["Google Maps API", "Stripe/PayPal", "Firebase"],
-  "risk_level": "medium",
-  "admin_panel_required": true,
-  "ai_features_required": false,
-  "strategic_insights": "This is a classic dual-sided marketplace (walkers vs owners). The primary technical challenge is real-time geolocation tracking which consumes battery and requires robust socket connections. For an MVP, focus on the core booking flow and simple tracking. Trust and safety (background checks) are critical non-functional requirements. I recommend starting with a cross-platform mobile framework to save costs.",
-  "recommended_stack": ["React Native", "Node.js", "PostgreSQL", "Socket.io", "Google Maps SDK", "Stripe Connect"]
-}
+Feature strings list:
+- user_authentication, online_payments, booking_system, admin_dashboard, real_time_chat, ai_recommendations, push_notifications, social_login, analytics_dashboard, file_upload, search_functionality, geolocation, video_streaming, multi_language, email_notifications
 `;
 
 function validateAIOutput(data: any): AIAnalysis | null {
