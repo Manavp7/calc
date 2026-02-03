@@ -38,8 +38,8 @@ export async function GET() {
             if (!p.inputs) return p;
 
             try {
-                const internalCost = calculateInternalCost(p.inputs);
-                const clientPrice = calculateClientPrice(p.inputs);
+                const internalCost = calculateInternalCost(p.inputs as any);
+                const clientPrice = calculateClientPrice(p.inputs as any);
                 const profitAnalysis = calculateProfit(clientPrice, internalCost);
 
                 return {

@@ -57,15 +57,8 @@ export interface Feature {
     };
 }
 
-export interface PricingInputs {
-    projectDescription: string; // Client's project description
-
-    // Contact Details
-    clientName: string;
-    companyName: string;
-    email: string;
-    phone: string;
-
+// Base inputs required for calculation logic
+export interface CalculationInputs {
     ideaType: IdeaType | null;
     productFormat: ProductFormat | null;
     techStack: TechStack | null;
@@ -73,6 +66,17 @@ export interface PricingInputs {
     deliverySpeed: DeliverySpeed;
     supportDuration: SupportDuration;
     complexityLevel?: 'basic' | 'medium' | 'advanced';
+}
+
+// Full inputs including metadata
+export interface PricingInputs extends CalculationInputs {
+    projectDescription: string; // Client's project description
+
+    // Contact Details
+    clientName: string;
+    companyName: string;
+    email: string;
+    phone: string;
 }
 
 export interface RoleCost {

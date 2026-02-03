@@ -1,5 +1,6 @@
 import {
     PricingInputs,
+    CalculationInputs,
     ClientPrice,
     InternalCost,
     ProfitAnalysis,
@@ -53,7 +54,7 @@ function calculateFeatureHours(featureIds: string[]) {
 /**
  * Calculate internal cost (what it actually costs us)
  */
-export function calculateInternalCost(inputs: PricingInputs, config: PricingConfiguration = DEFAULT_CONFIG): InternalCost {
+export function calculateInternalCost(inputs: CalculationInputs, config: PricingConfiguration = DEFAULT_CONFIG): InternalCost {
     if (!inputs.ideaType) {
         return {
             laborCosts: [],
@@ -206,7 +207,7 @@ export function calculateInternalCost(inputs: PricingInputs, config: PricingConf
 /**
  * Calculate client-facing price
  */
-export function calculateClientPrice(inputs: PricingInputs, config: PricingConfiguration = DEFAULT_CONFIG): ClientPrice {
+export function calculateClientPrice(inputs: CalculationInputs, config: PricingConfiguration = DEFAULT_CONFIG): ClientPrice {
     if (!inputs.ideaType) {
         return {
             basePrice: 0,
@@ -328,7 +329,7 @@ export function calculateProfit(
 /**
  * Calculate project timeline
  */
-export function calculateTimeline(inputs: PricingInputs, internalCost: InternalCost, config: PricingConfiguration = DEFAULT_CONFIG): Timeline {
+export function calculateTimeline(inputs: CalculationInputs, internalCost: InternalCost, config: PricingConfiguration = DEFAULT_CONFIG): Timeline {
     if (!inputs.ideaType) {
         return {
             phases: [],
@@ -505,7 +506,7 @@ export function generateClientCostBreakdown(internalCost: InternalCost): CostBre
  * Generate risk warnings for admin
  */
 export function generateRiskWarnings(
-    inputs: PricingInputs,
+    inputs: CalculationInputs,
     profit: ProfitAnalysis,
     timeline: Timeline
 ): RiskWarning[] {

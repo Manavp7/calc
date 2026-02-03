@@ -22,17 +22,17 @@ export async function GET(
         if (project.inputs) {
             try {
                 // 1. Recalculate Internal Cost (with new Tech Multiplier)
-                const internalCost = calculateInternalCost(project.inputs);
+                const internalCost = calculateInternalCost(project.inputs as any);
 
                 // 2. Recalculate Client Price (with new Format Multiplier)
-                const clientPrice = calculateClientPrice(project.inputs);
+                const clientPrice = calculateClientPrice(project.inputs as any);
 
                 // 3. Recalculate Profit Analysis
                 const profitAnalysis = calculateProfit(clientPrice, internalCost);
 
                 // 4. Override stored values with fresh calculations
-                project.internalCost = internalCost;
-                project.clientPrice = clientPrice; // Note: clientPrice structure in DB might differ slightly, but this ensures pricing engine consistency
+                project.internalCost = internalCost as any;
+                project.clientPrice = clientPrice as any; // Note: clientPrice structure in DB might differ slightly, but this ensures pricing engine consistency
                 project.profitAnalysis = profitAnalysis;
 
                 // Also update the top-level clientPrice/profit fields if they exist on the schema
