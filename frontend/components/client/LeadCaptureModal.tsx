@@ -117,7 +117,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit, variant = 
             initial={variant === 'modal' ? { opacity: 0, scale: 0.95, y: 20 } : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={variant === 'modal' ? { opacity: 0, scale: 0.95, y: 20 } : { opacity: 0, y: -20 }}
-            className={variant === 'modal' ? "fixed inset-0 z-50 flex items-center justify-center p-4" : "w-full max-w-lg mx-auto relative"}
+            className={variant === 'modal' ? "fixed inset-0 z-[101] flex items-center justify-center p-4" : "w-full max-w-lg mx-auto relative"}
         >
             <div className={`glass rounded-3xl p-8 w-full relative overflow-hidden ring-1 ring-white/10 ${variant === 'modal' ? 'max-w-lg shadow-2xl' : 'shadow-xl'}`}>
                 {/* Background Glow */}
