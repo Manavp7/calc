@@ -421,11 +421,11 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
                                 </div>
 
                                 {/* Detailed Labor Breakdown (Internal Only) */}
-                                {(viewMode === 'admin' || viewMode === 'internal') && displayCost.laborCosts && (
-                                    <div className="glass rounded-2xl p-6 lg:col-span-2">
+                                {['admin', 'internal'].includes(viewMode) && displayCost.laborCosts && (
+                                    <div className="glass rounded-2xl p-6 lg:col-span-2 mt-6">
                                         <h3 className="text-xl font-bold mb-4">Detailed Labor Allocation</h3>
                                         <div className="overflow-x-auto">
-                                            <table className="w-full text-left">
+                                            <table className="w-full">
                                                 <thead>
                                                     <tr className="border-b border-white/10 text-gray-500 text-sm">
                                                         <th className="pb-3 text-left">Role</th>
