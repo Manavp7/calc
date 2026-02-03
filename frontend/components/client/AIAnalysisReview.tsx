@@ -30,7 +30,8 @@ export default function AIAnalysisReview({ analysis, onConfirm, onEdit }: AIAnal
         mobile_app: 'Mobile App',
         web_and_app: 'Web + Mobile App',
         enterprise: 'Enterprise Solution',
-        ai_product: 'AI Product'
+        ai_product: 'AI Product',
+        startup_product: 'Startup Product'
     };
 
     const complexityLabels = {
