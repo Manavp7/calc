@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
                     await dbConnect();
 
                     // Case-insensitive email search
-                    const email = credentials.email.toLowerCase();
+                    const email = credentials.email.toLowerCase().trim();
                     const user = await User.findOne({ email });
 
                     if (!user) {
