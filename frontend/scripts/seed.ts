@@ -12,9 +12,9 @@ async function seed() {
     // Create admin user
     const adminPassword = await bcrypt.hash('admin123', 10);
     const admin = await User.findOneAndUpdate(
-        { email: 'admin@demo.com' },
+        { email: 'admin@example.com' },
         {
-            email: 'admin@demo.com',
+            email: 'admin@example.com',
             name: 'Admin User',
             password: adminPassword,
             role: 'admin',
@@ -26,9 +26,9 @@ async function seed() {
     // Create company head user
     const companyHeadPassword = await bcrypt.hash('head123', 10);
     const companyHead = await User.findOneAndUpdate(
-        { email: 'head@demo.com' },
+        { email: 'head@example.com' },
         {
-            email: 'head@demo.com',
+            email: 'head@example.com',
             name: 'Company Head',
             password: companyHeadPassword,
             role: 'company_head',
@@ -144,8 +144,8 @@ async function seed() {
 
     console.log('\n🎉 Database seeded successfully!');
     console.log('\n📝 Login credentials:');
-    console.log('Admin: admin@demo.com / admin123');
-    console.log('Company Head: head@demo.com / head123');
+    console.log('Admin: admin@example.com / admin123');
+    console.log('Company Head: head@example.com / head123');
 
     process.exit(0);
 }
