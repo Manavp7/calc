@@ -23,6 +23,8 @@ import {
     OVERHEAD_PERCENTAGE,
     DELIVERY_SPEEDS,
     CLIENT_COST_CATEGORIES,
+    DYNAMIC_HOURLY_RATES,
+    MAX_PRICE_CAPS,
 } from './constants';
 
 /**
@@ -207,6 +209,10 @@ export function calculateInternalCost(inputs: CalculationInputs, config: Pricing
 /**
  * Calculate client-facing price
  */
+
+/**
+ * Calculate client-facing price
+ */
 export function calculateClientPrice(inputs: CalculationInputs, config: PricingConfiguration = DEFAULT_CONFIG): ClientPrice {
     if (!inputs.ideaType) {
         return {
@@ -251,15 +257,26 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
     const timelineMultiplier = config.timelineMultipliers[inputs.deliverySpeed] || 1.0;
 
     // 4. Calculate Adjusted Development Hours
-    // We apply multipliers to the hours to reflect the increased effort/value
-    const adjustedDevHours = (baseHoursTotal + featureHoursTotal) * formatMultiplier * techMultiplier * complexityMultiplier * timelineMultiplier;
+    // Apply multipliers.
+    // DAMPENER: If multiple high multipliers exist, dampen them slightly to avoid explosion.
+    let combinedMultiplier = formatMultiplier * techMultiplier * complexityMultiplier * timelineMultiplier;
+    // Cap combined multiplier to sensible limit (e.g., 3.5x max) unless valid heavy enterprise
+    if (inputs.ideaType !== 'enterprise software') {
+        combinedMultiplier = Math.min(combinedMultiplier, 3.5);
+    }
 
-    // 5. Calculate Development Cost
-    // Use configured client hourly rate or default
-    const hourlyRate = config.clientHourlyRate || 120;
+    const adjustedDevHours = (baseHoursTotal + featureHoursTotal) * combinedMultiplier;
+
+    // 5. Determine Hourly Rate
+    // Use dynamic rate based on Idea Type (Startup=Low, Enterprise=High)
+    // Fallback to configured rate or constant
+    const DYNAMIC_RATES = (config as any).DYNAMIC_HOURLY_RATES || DYNAMIC_HOURLY_RATES;
+    let hourlyRate = DYNAMIC_RATES[inputs.ideaType] || config.clientHourlyRate || 100;
+
+    // 6. Calculate Development Cost (The Build Price)
     const devCost = adjustedDevHours * hourlyRate;
 
-    // 6. Calculate Support Cost
+    // 7. Calculate Support Cost (Separate Add-on)
     const supportMonths = inputs.supportDuration === '3-months' ? 3
         : inputs.supportDuration === '6-months' ? 6
             : inputs.supportDuration === '12-months' ? 12
@@ -268,10 +285,23 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
     // Monthly hours from config
     const monthlySupportHours = config.supportHours[inputs.supportDuration] || 0;
     const totalSupportHours = monthlySupportHours * supportMonths;
+    // Support usually billed at standard rate or slightly discounted/premium depending on model.
+    // Let's use the same rate for simplicity but it's separate line item.
     const supportCost = totalSupportHours * hourlyRate;
 
-    // 7. Total Price
-    let totalPrice = devCost + supportCost;
+    // 8. Total Price (Build Cost Only)
+    // Support is now excluded from the main 'Estimated Investment' to behave like an add-on.
+    let totalPrice = devCost;
+
+    // 9. Sanity Cap (Circuit Breaker)
+    const MAX_CAPS = (config as any).MAX_PRICE_CAPS || MAX_PRICE_CAPS;
+    if (MAX_CAPS[inputs.ideaType]) {
+        const cap = MAX_CAPS[inputs.ideaType];
+        if (totalPrice > cap) {
+            console.warn(`Price clamped for ${inputs.ideaType}: ${totalPrice} -> ${cap}`);
+            totalPrice = cap;
+        }
+    }
 
     // Round to nearest 100
     totalPrice = Math.round(totalPrice / 100) * 100;
@@ -282,10 +312,9 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
         max: Math.round(totalPrice * 1.15 / 100) * 100,
     };
 
-    // For breakdown consistency, we assign the cost portion of base hours to basePrice
-    // and feature hours to featuresCost
-    const basePrice = (baseHoursTotal * techMultiplier * complexityMultiplier * timelineMultiplier) * hourlyRate;
-    const featuresCost = (featureHoursTotal * techMultiplier * complexityMultiplier * timelineMultiplier) * hourlyRate;
+    // For breakdown consistency
+    const basePrice = (totalPrice * (baseHoursTotal / (baseHoursTotal + featureHoursTotal)));
+    const featuresCost = totalPrice - basePrice;
 
     return {
         basePrice,
@@ -293,7 +322,7 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
         techMultiplier,
         complexityMultiplier,
         timelineMultiplier,
-        supportCost,
+        supportCost, // Returned separately, not in totalPrice
         totalPrice,
         priceRange,
         totalDevHours: Math.round(adjustedDevHours),

@@ -279,6 +279,26 @@ export const OVERHEAD_PERCENTAGE = 0.15; // 15%
 export const RISK_BUFFER_MIN = 0.10; // 10%
 export const RISK_BUFFER_MAX = 0.20; // 20%
 
+// Dynamic Hourly Rates by Idea Type (User Request)
+export const DYNAMIC_HOURLY_RATES: Record<string, number> = {
+    'business-website': 45,
+    'startup-product': 50,
+    'mobile-app': 60,
+    'website-mobile-app': 75,
+    'ai-powered-product': 95,
+    'enterprise software': 150,
+};
+
+// Sanity Caps (Circuit Breakers)
+export const MAX_PRICE_CAPS: Record<string, number> = {
+    'business-website': 25000,
+    'startup-product': 85000,
+    'mobile-app': 100000,
+    'website-mobile-app': 120000,
+    'ai-powered-product': 150000,
+    // Enterprise has no hard cap, but we rely on the rate
+};
+
 // Export pricing constants for database seeding
 export const IDEA_COSTS: Record<IdeaType, number> = {
     'business-website': 15000,
