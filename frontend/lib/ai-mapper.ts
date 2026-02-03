@@ -29,6 +29,10 @@ export function mapAIOutputToPricingInputs(aiData: AIAnalysis): Partial<PricingI
             inputs.ideaType = 'ai-powered-product';
             inputs.productFormat = 'full-ecosystem' as ProductFormat;
             break;
+        case 'startup_product':
+            inputs.ideaType = 'startup-product';
+            inputs.productFormat = 'website-and-app' as ProductFormat;
+            break;
     }
 
     // Map platforms to tech stack

@@ -1,6 +1,6 @@
 // AI Analysis Types
 export interface AIAnalysis {
-    project_type: 'website' | 'mobile_app' | 'web_and_app' | 'enterprise' | 'ai_product';
+    project_type: 'website' | 'mobile_app' | 'web_and_app' | 'enterprise' | 'ai_product' | 'startup_product';
     platforms: ('web' | 'android' | 'ios')[];
     idea_domain: string;
     required_features: string[];
@@ -124,5 +124,6 @@ export const PROJECT_TYPE_COSTS = {
     mobile_app: 8000,
     web_and_app: 12000,
     enterprise: 25000,
-    ai_product: 15000
+    ai_product: 15000,
+    startup_product: 6000
 };

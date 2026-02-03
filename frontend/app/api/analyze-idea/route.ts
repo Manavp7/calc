@@ -2,69 +2,70 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { AIAnalysis } from '@/lib/ai-types';
 
-const SYSTEM_PROMPT = `You are a world-class software architect and product strategist. Your task is to deeply analyze project ideas and extract structured, high-quality requirements.
+const SYSTEM_PROMPT = `You are an **Expert Product Strategist**. Your goal is to analyze the product idea and select the **single best-fit category**, then extract structurd requirements.
 
-You have access to a paid, high-performance API, so be thorough and detailed.
+### STEP 1: CATEGORY SELECTION (STRICT DECISION RULES)
 
-You must return ONLY valid JSON with no additional text.
+1. **AI Powered Product** (Map to 'ai_product')
+   - Choose ONLY if AI is the *core differentiator* (e.g., AI hiring screener, Trading bot).
+   - If product loses major value without AI -> It IS an AI Product.
+   - If AI just adds insights/alerts -> It is NOT an AI Product.
 
-### CLIASSIFICATION RULES (STRICT)
+2. **Enterprise Software** (Map to 'enterprise')
+   - Internal business operations, dashboards, ERP, CRM.
+   - Multi-user, role-based, B2B focus.
 
-1. **Platform Classification**
-   - Classify the product into ONLY ONE platform type unless explicitly asked for multiple.
-   - Browser-based or Cloud-hosted -> **web**
-   - Mobile store release -> **android** / **ios**
-   - Do NOT infer "mobile_app" just because a site is "responsive".
+3. **Startup Product** (Map to 'startup_product')
+   - Early-stage MVP, market validation focus.
+   - Broad idea, evolving scope, often B2C or B2B2C.
 
-2. **AI Role Classification**
-   - **Core AI Product**: The product CANNOT function without AI (e.g., Midjourney, ChatGPT). Map to 'ai_product'.
-   - **AI-Enhanced Software**: The product works without AI, but AI adds value (e.g., Sales Dashboard with AI insights). Map to 'website' or 'mobile_app' with 'ai_features_required': true.
-   - **Non-AI Software**: No AI features.
+4. **Business Website** (Map to 'website')
+   - Marketing sites, landing pages, company presence.
+   - Standard content, no complex business logic.
 
-### FEW-SHOT TRAINING EXAMPLES
+5. **Mobile App** (Map to 'mobile_app')
+   - Mobile-first usage, on-the-go consumers.
+   - Heavy device interaction (GPS, Camera).
 
-✅ **Example 1 (AI-Enhanced Web App)**
-Input: "A web-based dashboard for sales tracking with AI-generated insights."
-Output Logic:
-- Platform: Web Application
-- AI Classification: AI-Enhanced (Not Core)
-- Result: "project_type": "website", "ai_features_required": true
+6. **Website + Mobile App** (Map to 'web_and_app')
+   - CLEARLY requires both platforms for consumer scale.
+   - Only choose if omni-channel is essential.
 
-✅ **Example 2 (Core AI Product)**
-Input: "An LLM that generates legal contracts."
-Output Logic:
-- Platform: API/Web
-- AI Classification: Core AI
-- Result: "project_type": "ai_product", "ai_features_required": true
+### STEP 2: JSON EXTRACTION
 
-✅ **Example 3 (Standard Web App)**
-Input: "A browser-based invoicing tool."
-Output Logic:
-- Platform: Web Application
-- AI Classification: Non-AI
-- Result: "project_type": "website", "ai_features_required": false
+Return ONLY valid JSON.
 
-### FINAL VALIDATION CHECK
-- ❓ Can the product work without AI? -> Yes -> Do NOT select 'ai_product'.
-- ❓ Is installation required on a phone? -> No -> Do NOT select 'mobile_app'.
-
-### REQUIRED JSON OUTPUT FORMAT
 {
-  "project_type": "website | mobile_app | web_and_app | enterprise | ai_product",
+  "project_type": "website | mobile_app | web_and_app | enterprise | ai_product | startup_product",
   "platforms": ["web", "android", "ios"],
-  "idea_domain": "string (e.g., fintech, health, ecommerce)",
-  "required_features": ["array of feature strings (snake_case)"],
+  "idea_domain": "string",
+  "required_features": ["user_authentication", "online_payments", "booking_system", "admin_dashboard", "real_time_chat", "ai_recommendations", "push_notifications", "social_login", "analytics_dashboard", "file_upload", "search_functionality", "geolocation", "video_streaming", "multi_language", "email_notifications"],
   "complexity_level": "basic | medium | advanced",
-  "third_party_integrations": ["array of strings"],
+  "third_party_integrations": ["string"],
   "risk_level": "low | medium | high",
-  "admin_panel_required": true/false,
-  "ai_features_required": true/false,
-  "strategic_insights": "Detailed strategic analysis (2-3 paragraphs). Explain the classification logic used.",
-  "recommended_stack": ["Next.js", "React Native", "PostgreSQL", "etc"]
+  "admin_panel_required": boolean,
+  "ai_features_required": boolean,
+  "strategic_insights": "Detailed strategic analysis explaining the categorization.",
+  "recommended_stack": ["string"]
 }
 
-Feature strings list:
-- user_authentication, online_payments, booking_system, admin_dashboard, real_time_chat, ai_recommendations, push_notifications, social_login, analytics_dashboard, file_upload, search_functionality, geolocation, video_streaming, multi_language, email_notifications
+### FEW-SHOT EXAMPLES
+
+**Input:** "Web-based dashboard to manage sales & expenses with AI alerts."
+**Logic:** Internal tool + AI matches "Enterprise". AI is not core.
+**Result:** "project_type": "enterprise", "ai_features_required": true
+
+**Input:** "An AI system that predicts inventory demand and auto-purchases."
+**Logic:** AI is central. Without AI, it does nothing.
+**Result:** "project_type": "ai_product", "ai_features_required": true
+
+**Input:** "A fitness tracking app for mobile users."
+**Logic:** Mobile first.
+**Result:** "project_type": "mobile_app", "ai_features_required": false
+
+**Input:** "MVP to test a new food delivery concept."
+**Logic:** MVP / validation focus.
+**Result:** "project_type": "startup_product", "ai_features_required": false
 `;
 
 function validateAIOutput(data: any): AIAnalysis | null {
@@ -73,14 +74,9 @@ function validateAIOutput(data: any): AIAnalysis | null {
         const requiredFields = [
             'project_type',
             'platforms',
-            'idea_domain',
             'required_features',
             'complexity_level',
-            'third_party_integrations',
-            'risk_level',
-            'admin_panel_required',
             'ai_features_required'
-            // strategic_insights and recommended_stack are optional in type but we want them if possible
         ];
 
         for (const field of requiredFields) {
@@ -91,32 +87,9 @@ function validateAIOutput(data: any): AIAnalysis | null {
         }
 
         // Validate enums
-        const validProjectTypes = ['website', 'mobile_app', 'web_and_app', 'enterprise', 'ai_product'];
+        const validProjectTypes = ['website', 'mobile_app', 'web_and_app', 'enterprise', 'ai_product', 'startup_product'];
         if (!validProjectTypes.includes(data.project_type)) {
             console.error(`Invalid project_type: ${data.project_type}`);
-            return null;
-        }
-
-        const validComplexity = ['basic', 'medium', 'advanced'];
-        if (!validComplexity.includes(data.complexity_level)) {
-            console.error(`Invalid complexity_level: ${data.complexity_level}`);
-            return null;
-        }
-
-        const validRisk = ['low', 'medium', 'high'];
-        if (!validRisk.includes(data.risk_level)) {
-            console.error(`Invalid risk_level: ${data.risk_level}`);
-            return null;
-        }
-
-        // Validate arrays
-        if (!Array.isArray(data.platforms) || data.platforms.length === 0) {
-            console.error('Invalid platforms array');
-            return null;
-        }
-
-        if (!Array.isArray(data.required_features)) {
-            console.error('Invalid required_features array');
             return null;
         }
 
