@@ -393,17 +393,14 @@ export function calculateTimeline(inputs: CalculationInputs, internalCost: Inter
     const rawWeeks = Math.ceil(totalHours / (avgTeamSize * 40));
 
     // Apply delivery speed adjustment to get FINAL weeks
-    let finalWeeks = rawWeeks;
+    let calculatedWeeks = rawWeeks;
     const speedMultiplier = config.timelineMultipliers[inputs.deliverySpeed] || 1.0;
 
     if (speedMultiplier > 1) {
         // Use a more consistent divisor based on the multiplier itself to be mathematically accurate
         // If speed is 1.3x faster, time is 1/1.3
-        finalWeeks = Math.ceil(rawWeeks / speedMultiplier);
+        calculatedWeeks = Math.ceil(rawWeeks / speedMultiplier);
     }
-
-    // Ensure at least 1 week
-    finalWeeks = Math.max(1, finalWeeks);
 
     // Define phases with weights
     const phaseWeights = [
@@ -414,39 +411,60 @@ export function calculateTimeline(inputs: CalculationInputs, internalCost: Inter
         { name: 'Launch & Handoff', weight: 0.08 },
     ];
 
-    // Distribute weeks ensuring sum equals finalWeeks
+    // CRITICAL FIX: Ensure every phase gets at least 1 week.
+    // This implies a minimum project duration of 5 weeks (1 per phase).
+    // For "Startup MVP" small projects, this is actually more realistic than 3 weeks.
+    const minWeeks = phaseWeights.length; // 5
+    const finalWeeks = Math.max(minWeeks, calculatedWeeks);
+
+    // Distribute weeks
+    // We start by giving everyone their weighted share
+    // BUT we enforce a floor of 1 for everyone.
     let remainingWeeks = finalWeeks;
-    const phases = phaseWeights.map((p, i) => {
-        // For the last item, give it the remaining weeks to ensure sum is exact
-        if (i === phaseWeights.length - 1) {
-            // Ensure we don't return negative duration, but otherwise trust remainingWeeks
-            return { name: p.name, duration: Math.max(0, remainingWeeks) };
-        }
 
+    // First pass: Calculate ideal weighted duration, floor at 1
+    const phaseDurations = phaseWeights.map(p => {
         let duration = Math.round(finalWeeks * p.weight);
-
-        // Ensure strictly positive phases if possible, but respect total
-        if (duration === 0 && finalWeeks > 3) duration = 1;
-
-        // Clamp duration to remaining
-        duration = Math.min(duration, remainingWeeks);
-
-        // Prevent taking ALL remaining time if not last phase (save at least 1 week for others if total > phases)
-        if (remainingWeeks - duration < (phaseWeights.length - 1 - i) && finalWeeks > phaseWeights.length) {
-            duration = Math.max(0, remainingWeeks - (phaseWeights.length - 1 - i));
-        }
-
-        remainingWeeks -= duration;
-        return { name: p.name, duration: Math.max(0, duration) };
+        if (duration < 1) duration = 1;
+        return { name: p.name, duration };
     });
 
-    // Safety check: Recalculate total weeks from phases to be 100% sure they match
-    // This handles any edge case in the rounding logic above
-    const calculatedTotalWeeks = phases.reduce((acc, p) => acc + p.duration, 0);
+    // Check sum
+    let currentSum = phaseDurations.reduce((acc, p) => acc + p.duration, 0);
+
+    // Adjust to match finalWeeks
+    if (currentSum !== finalWeeks) {
+        // If we assumed finalWeeks but the sum of (weight * final) differed due to rounding or flooring
+        // actually, simpler logic:
+        // Since we floored at 1, the sum is likely >= 5.
+        // If sum > finalWeeks, we might need to increase finalWeeks to match the sum (since we mandated min 1).
+        // If finalWeeks was 5, sum is 5.
+        // If finalWeeks was large, rounding errors might make sum != finalWeeks.
+
+        // Let's just trust the Sum as the Truth. 
+        // If the calculation says "6 weeks" but forcing min-1 pushes it to 7, so be it.
+        // BUT we should try to respect the calculated finalWeeks if it's large enough.
+
+        const diff = finalWeeks - currentSum;
+
+        if (diff > 0) {
+            // We have spare weeks to distribute (e.g. calculated 10, sum is 8)
+            // Add to Development (heaviest) or evenly?
+            // Add to Development
+            const devPhase = phaseDurations.find(p => p.name === 'Development');
+            if (devPhase) devPhase.duration += diff;
+        }
+        // If diff < 0, it means our "min 1 week" rule pushed us over the calculated amount.
+        // That's fine, we return the higher amount (Detailed Sum) as the robust answer.
+    }
+
+    // Final check to be safe
+    const finalPhases = phaseDurations;
+    const finalTotalWeeks = finalPhases.reduce((acc, p) => acc + p.duration, 0);
 
     return {
-        phases,
-        totalWeeks: calculatedTotalWeeks, // Use the sum of phases as the source of truth
+        phases: finalPhases,
+        totalWeeks: finalTotalWeeks,
         teamSize,
     };
 }
