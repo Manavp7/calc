@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { seedDefaultUsers } from '@/lib/seed';
 
-export async function POST() {
+export async function GET() {
     try {
         const result = await seedDefaultUsers();
 
