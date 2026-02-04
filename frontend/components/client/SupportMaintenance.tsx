@@ -82,10 +82,10 @@ export default function SupportMaintenance() {
                                 });
                             }, 100);
                         }}
-                        disabled={!inputs.ideaType || inputs.selectedFeatures.length === 0}
+                        disabled={!inputs.ideaType}
                         className={`
               btn-primary text-xl px-12 py-6
-              ${(!inputs.ideaType || inputs.selectedFeatures.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}
+              ${!inputs.ideaType ? 'opacity-50 cursor-not-allowed' : ''}
             `}
                     >
                         Calculate My Estimate
@@ -98,9 +98,9 @@ export default function SupportMaintenance() {
                         </motion.span>
                     </button>
 
-                    {(!inputs.ideaType || inputs.selectedFeatures.length === 0) && (
+                    {!inputs.ideaType && (
                         <p className="text-red-400 mt-4 text-sm">
-                            {!inputs.ideaType ? 'Please select an idea type' : 'Please select at least one feature'} to continue
+                            Please select an idea type to continue
                         </p>
                     )}
                 </motion.div>
