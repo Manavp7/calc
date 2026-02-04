@@ -128,9 +128,9 @@ export async function POST(request: NextRequest) {
             if (!process.env.GEMINI_API_KEY) throw new Error('No API Key');
 
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            // Using gemini-1.5-pro for maximum reasoning capability
+            // Using gemini-2.0-flash for maximum speed and reasoning capability (User Request: Gemini 2)
             const model = genAI.getGenerativeModel({
-                model: "gemini-1.5-pro",
+                model: "gemini-2.0-flash",
                 generationConfig: { responseMimeType: "application/json" }
             });
 

@@ -11,7 +11,7 @@ export const analyzeProjectComplexity = async (req: Request, res: Response) => {
             return res.status(500).json({ error: 'Gemini API key not configured' });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         const prompt = `
         You are an expert software estimator. Analyze the following project details and determine its complexity level.
