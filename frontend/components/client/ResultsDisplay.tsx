@@ -161,7 +161,16 @@ export default function ResultsDisplay() {
     }
 
     const handleDownloadPDF = () => {
-        generatePricingPDF(inputs, clientPrice, timeline, costBreakdown);
+        // Create masked inputs for privacy - Client download should not show personal PII
+        // This matches the user's specific request to hide name/email/phone/company in the client-facing PDF
+        const maskedInputs = {
+            ...inputs,
+            clientName: 'Valued Client',
+            companyName: '', // Hide company name
+            email: '',       // Hide email
+            phone: '',       // Hide phone
+        };
+        generatePricingPDF(maskedInputs, clientPrice, timeline, costBreakdown);
     };
 
     return (
