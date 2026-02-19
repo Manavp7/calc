@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
         if (mimeType === 'application/pdf' || fileName.endsWith('.pdf')) {
             // Use require for pdf-parse (CommonJS module — no default export in ESM bundle)
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            // eslint-disable-next-line
             const pdfParse = require('pdf-parse');
             const pdfData = await pdfParse(buffer);
             text = pdfData.text;
