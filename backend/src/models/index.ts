@@ -72,7 +72,7 @@ const PricingConfigSchema = new Schema<IPricingConfig>({
         'mobile-app': { type: Number, required: true },
         'website-mobile-app': { type: Number, required: true },
         'startup-product': { type: Number, required: true },
-        'enterprise software': { type: Number, required: true },
+        'enterprise-software': { type: Number, required: true },
         'ai-powered-product': { type: Number, required: true },
     },
     featureCosts: { type: Map, of: Number, required: true },

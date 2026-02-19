@@ -9,6 +9,84 @@ import { PricingConfiguration } from '@/lib/types';
 import { DEFAULT_CONFIG } from '@/lib/pricing-data';
 import { ROLE_LABELS } from '@/lib/constants';
 
+// Helper component for smooth editing with +/- buttons
+const DebouncedInput = ({
+    value,
+    onChange,
+    className,
+    suffix
+}: {
+    value: number;
+    onChange: (val: string) => void;
+    className?: string;
+    suffix?: string;
+}) => {
+    const [localValue, setLocalValue] = useState<string>(value.toString());
+
+    useEffect(() => {
+        if (parseFloat(localValue) !== value) {
+            setLocalValue(value.toString());
+        }
+    }, [value]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocalValue(e.target.value);
+    };
+
+    const commitChange = (val: string) => {
+        if (val === '' || isNaN(parseFloat(val))) {
+            setLocalValue(value.toString());
+        } else {
+            onChange(val);
+        }
+    };
+
+    const handleBlur = () => commitChange(localValue);
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            (e.target as HTMLInputElement).blur();
+        }
+    };
+
+    const adjustValue = (delta: number) => {
+        const current = parseInt(localValue) || 0;
+        const newVal = Math.max(0, current + delta);
+        setLocalValue(newVal.toString());
+        onChange(newVal.toString()); // Immediate update for buttons
+    };
+
+    return (
+        <div className="flex items-center gap-2">
+            <button
+                onClick={() => adjustValue(-10)}
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                type="button"
+            >
+                -
+            </button>
+            <div className="relative">
+                <input
+                    type="number"
+                    value={localValue}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
+                    className={`${className} appearance-none`}
+                />
+            </div>
+            <button
+                onClick={() => adjustValue(10)}
+                className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                type="button"
+            >
+                +
+            </button>
+            {suffix && <span className="text-gray-500 text-sm w-6">{suffix}</span>}
+        </div>
+    );
+};
+
 export default function AdminConfigPage() {
     const [config, setConfig] = useState<PricingConfiguration | null>(null);
     const [originalConfig, setOriginalConfig] = useState<PricingConfiguration | null>(null);
@@ -35,6 +113,46 @@ export default function AdminConfigPage() {
                 if (data.formatMultipliers) fullConfig.formatMultipliers = { ...DEFAULT_CONFIG.formatMultipliers, ...data.formatMultipliers };
                 if (data.hourlyRates) fullConfig.hourlyRates = { ...DEFAULT_CONFIG.hourlyRates, ...data.hourlyRates };
 
+                // Fix: Deep merge baseIdeaHours at the ROLE level to prevent NaN if DB has partial objects
+                if (data.baseIdeaHours) {
+                    fullConfig.baseIdeaHours = { ...DEFAULT_CONFIG.baseIdeaHours };
+                    Object.keys(data.baseIdeaHours).forEach((key) => {
+                        const dbHours = data.baseIdeaHours[key];
+                        const ideaKey = key as keyof typeof fullConfig.baseIdeaHours;
+                        // If we have a default for this key, merge valid DB values into it
+                        if (fullConfig.baseIdeaHours[ideaKey]) {
+                            const defaultRoleHours = (DEFAULT_CONFIG.baseIdeaHours as Record<string, typeof DEFAULT_CONFIG.baseIdeaHours[keyof typeof DEFAULT_CONFIG.baseIdeaHours]>)[key];
+                            const mergedHours = {
+                                ...defaultRoleHours,
+                                ...dbHours
+                            };
+
+                            // Sanitize: Ensure all values are valid numbers
+                            Object.keys(mergedHours).forEach(role => {
+                                const val = mergedHours[role as keyof typeof mergedHours];
+                                if (typeof val !== 'number' || isNaN(val)) {
+                                    mergedHours[role as keyof typeof mergedHours] = defaultRoleHours[role as keyof typeof defaultRoleHours] || 0;
+                                }
+                            });
+
+                            fullConfig.baseIdeaHours[ideaKey] = mergedHours;
+                        } else {
+                            // If it's a new key only in DB, use it directly but sanitize
+                            Object.keys(dbHours).forEach(role => {
+                                if (typeof dbHours[role] !== 'number' || isNaN(dbHours[role])) {
+                                    dbHours[role] = 0;
+                                }
+                            });
+                            fullConfig.baseIdeaHours[key as any] = dbHours;
+                        }
+                    });
+                }
+
+                // General sanitization for other numeric fields
+                if (fullConfig.clientHourlyRate === null || isNaN(fullConfig.clientHourlyRate)) {
+                    fullConfig.clientHourlyRate = DEFAULT_CONFIG.clientHourlyRate || 120;
+                }
+
                 setConfig(fullConfig);
                 setOriginalConfig(fullConfig);
             } else {
@@ -43,11 +161,13 @@ export default function AdminConfigPage() {
         } catch (error) {
             console.error(error);
             setMessage({ type: 'error', text: 'Failed to load configuration' });
-            // Fallback to default if API fails? Maybe strictly show error.
         } finally {
             setLoading(false);
         }
     };
+
+    // ... rest of the component methods ...
+
 
     const handleSave = async () => {
         if (!config) return;
@@ -245,61 +365,60 @@ export default function AdminConfigPage() {
                     >
                         <h2 className="text-xl font-semibold mb-4 text-primary-400 border-b border-white/10 pb-2">Base Idea Effort (Hours)</h2>
                         <div className="space-y-4">
-                            {config.baseIdeaHours && Object.entries(config.baseIdeaHours).map(([key, hours]) => {
-                                const totalHours = Object.values(hours).reduce((a, b) => a + b, 0);
+                            {config.baseIdeaHours && Object.entries(config.baseIdeaHours)
+                                .filter(([key]) => !key.includes(' '))
+                                .map(([key, hours]) => {
+                                    const totalHours = Object.values(hours).reduce((a, b) => a + b, 0);
 
-                                const updateHours = (newTotalStr: string) => {
-                                    if (!config) return;
-                                    const newTotal = parseInt(newTotalStr) || 0;
-                                    const ratio = totalHours > 0 ? newTotal / totalHours : 1;
+                                    const updateHours = (newTotalStr: string) => {
+                                        if (!config) return;
+                                        const newTotal = parseInt(newTotalStr) || 0;
+                                        const ratio = totalHours > 0 ? newTotal / totalHours : 1;
 
-                                    const newHours = {
-                                        frontend: Math.round(hours.frontend * ratio),
-                                        backend: Math.round(hours.backend * ratio),
-                                        designer: Math.round(hours.designer * ratio),
-                                        qa: Math.round(hours.qa * ratio),
-                                        pm: Math.round(hours.pm * ratio),
+                                        const newHours = {
+                                            frontend: Math.round(hours.frontend * ratio),
+                                            backend: Math.round(hours.backend * ratio),
+                                            designer: Math.round(hours.designer * ratio),
+                                            qa: Math.round(hours.qa * ratio),
+                                            pm: Math.round(hours.pm * ratio),
+                                        };
+
+                                        // Handle edge case where 0 -> N
+                                        if (totalHours === 0 && newTotal > 0) {
+                                            const split = Math.round(newTotal / 5);
+                                            newHours.frontend = split;
+                                            newHours.backend = split;
+                                            newHours.designer = split;
+                                            newHours.qa = split;
+                                            newHours.pm = split;
+                                        }
+
+                                        setConfig({
+                                            ...config,
+                                            baseIdeaHours: {
+                                                ...config.baseIdeaHours,
+                                                [key]: newHours
+                                            }
+                                        });
                                     };
 
-                                    // Handle edge case where 0 -> N
-                                    if (totalHours === 0 && newTotal > 0) {
-                                        const split = Math.round(newTotal / 5);
-                                        newHours.frontend = split;
-                                        newHours.backend = split;
-                                        newHours.designer = split;
-                                        newHours.qa = split;
-                                        newHours.pm = split;
-                                    }
-
-                                    setConfig({
-                                        ...config,
-                                        baseIdeaHours: {
-                                            ...config.baseIdeaHours,
-                                            [key]: newHours
-                                        }
-                                    });
-                                };
-
-                                return (
-                                    <div key={key} className="flex justify-between items-center group">
-                                        <div>
-                                            <label className="text-gray-300 capitalize block">{key.replace(/-/g, ' ')}</label>
-                                            <span className="text-xs text-gray-500">
-                                                ~${(totalHours * (config.clientHourlyRate || 120)).toLocaleString()} value
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="number"
+                                    return (
+                                        <div key={key} className="flex justify-between items-center group p-2 hover:bg-white/5 rounded-lg transition-colors">
+                                            <div>
+                                                <label className="text-gray-300 capitalize block font-medium">{key.replace(/-/g, ' ')}</label>
+                                                <span className="text-xs text-gray-500">
+                                                    ~${(totalHours * (config.clientHourlyRate || 120)).toLocaleString()} value
+                                                </span>
+                                            </div>
+                                            <DebouncedInput
                                                 value={totalHours}
-                                                onChange={(e) => updateHours(e.target.value)}
-                                                className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-24 text-right focus:border-primary-500 focus:outline-none transition-colors"
+                                                onChange={updateHours}
+                                                className="bg-black/50 border border-white/10 rounded-lg px-3 py-1 w-20 text-center focus:border-primary-500 focus:outline-none transition-colors"
+                                                suffix="hrs"
                                             />
-                                            <span className="text-gray-500 text-sm">hrs</span>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
                         </div>
                     </motion.section>
 

@@ -25,13 +25,18 @@ export default function AIAnalysisReview({ analysis, onConfirm, onEdit }: AIAnal
         }));
     };
 
-    const projectTypeLabels = {
+    const projectTypeLabels: Record<string, string> = {
         website: 'Website',
         mobile_app: 'Mobile App',
         web_and_app: 'Web + Mobile App',
         enterprise: 'Enterprise Solution',
         ai_product: 'AI Product',
-        startup_product: 'Startup Product'
+        startup_product: 'Startup Product',
+        'business-website': 'Business Website',
+        'mobile-app': 'Mobile App',
+        'website-mobile-app': 'Web + Mobile App',
+        'enterprise-software': 'Enterprise Software',
+        'ai-powered-product': 'AI-Powered Product',
     };
 
     const complexityLabels = {

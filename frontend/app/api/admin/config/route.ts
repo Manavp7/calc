@@ -60,9 +60,11 @@ export async function POST(req: Request) {
         // Deactivate all previous configs
         await PricingConfig.updateMany({}, { isActive: false });
 
-        // Create new config
+        // Create new config (exclude _id to avoid duplicate key error)
+        const { _id, createdAt, updatedAt, __v, ...configData } = data;
+
         const newConfig = await PricingConfig.create({
-            ...data,
+            ...configData,
             version: newVersion,
             isActive: true,
             createdBy: user._id,

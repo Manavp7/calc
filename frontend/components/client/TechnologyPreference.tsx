@@ -5,7 +5,7 @@ import { usePricingStore } from '@/lib/store';
 import { TECH_STACKS } from '@/lib/constants';
 
 export default function TechnologyPreference() {
-    const { inputs, setTechStack } = usePricingStore();
+    const { inputs, toggleTechStack } = usePricingStore();
 
     return (
         <section className="section bg-[#030712] relative py-20 border-t border-white/5 z-20 flex flex-col justify-center">
@@ -28,12 +28,12 @@ export default function TechnologyPreference() {
 
                 <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
                     {TECH_STACKS.map((tech, index) => {
-                        const isSelected = inputs.techStack === tech.id;
+                        const isSelected = inputs.techStack.includes(tech.id);
 
                         return (
                             <motion.button
                                 key={tech.id}
-                                onClick={() => setTechStack(tech.id)}
+                                onClick={() => toggleTechStack(tech.id)}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true, margin: "100px" }}

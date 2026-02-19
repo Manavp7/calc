@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
 import { Project } from '@/lib/models';
 
+export const dynamic = 'force-dynamic';
+
 // POST - Save a new project/quote
 export async function POST(request: NextRequest) {
     try {

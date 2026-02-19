@@ -3,6 +3,8 @@ import { dbConnect } from '@/lib/db';
 import { Project } from '@/lib/models';
 import { calculateInternalCost, calculateClientPrice, calculateProfit } from '@/lib/pricing-engine';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Fetch single project details by ID
 // Recalculates pricing on-the-fly to ensure consistency with latest formulas
 export async function GET(

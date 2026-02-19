@@ -9,19 +9,20 @@ export function analyzeIdeaLocally(text: string): AIAnalysis {
 
     // 1. Detect Features
     const keywordMap: Record<string, string[]> = {
-        user_authentication: ['login', 'sign up', 'account', 'user', 'auth', 'profile', 'member'],
-        online_payments: ['pay', 'stripe', 'money', 'transaction', 'subscription', 'buy', 'cart', 'checkout'],
-        booking_system: ['book', 'schedule', 'reservation', 'appointment', 'calendar'],
-        real_time_chat: ['chat', 'message', 'messaging', 'talk', 'communicate'],
-        admin_dashboard: ['admin', 'panel', 'dashboard', 'manage', 'analytics', 'report'],
-        ai_recommendations: ['ai', 'recommend', 'intelligence', 'robot', 'learn', 'suggest', 'ml', 'machine learning'],
-        geolocation: ['map', 'location', 'gps', 'track', 'route', 'navigation'],
-        push_notifications: ['notify', 'notification', 'alert', 'remind'],
-        file_upload: ['upload', 'image', 'picture', 'file', 'video', 'document'],
-        social_login: ['google', 'facebook', 'social', 'oauth'],
-        search_functionality: ['search', 'find', 'filter', 'query'],
-        video_streaming: ['video', 'stream', 'live'],
-        multi_language: ['language', 'translation', 'translate', 'english', 'spanish'],
+        user_authentication: ['login', 'sign up', 'account', 'user', 'auth', 'profile', 'member', 'registration', 'access'],
+        online_payments: ['pay', 'stripe', 'money', 'transaction', 'subscription', 'buy', 'sell', 'store', 'shop', 'ecommerce', 'billing', 'cart', 'checkout', 'invoice', 'clearing'],
+        booking_system: ['book', 'schedule', 'reservation', 'appointment', 'calendar', 'date', 'meeting'],
+        real_time_chat: ['chat', 'message', 'messaging', 'talk', 'communicate', 'dm', 'inbox'],
+        admin_dashboard: ['admin', 'panel', 'dashboard', 'control', 'manage', 'analytics', 'report', 'cms', 'system', 'clearing', 'matching', 'automation'],
+        ai_recommendations: ['ai', 'recommend', 'intelligence', 'robot', 'learn', 'suggest', 'ml', 'machine learning', 'gpt', 'bot', 'automation'],
+        geolocation: ['map', 'location', 'gps', 'track', 'route', 'navigation', 'nearby'],
+        push_notifications: ['notify', 'notification', 'alert', 'remind', 'push', 'update'],
+        file_upload: ['upload', 'image', 'picture', 'file', 'video', 'document', 'media', 'gallery', 'invoice', 'bill', 'receipt'],
+        social_login: ['google', 'facebook', 'social', 'oauth', 'apple'],
+        search_functionality: ['search', 'find', 'filter', 'query', 'lookup', 'matching', 'clearing'],
+        video_streaming: ['video', 'stream', 'live', 'zoom', 'broadcast'],
+        multi_language: ['language', 'translation', 'translate', 'english', 'spanish', 'localization', 'global'],
+        data_security: ['secure', 'security', 'private', 'privacy', 'encrypt', 'financial', 'clearing'],
     };
 
     // Always assume basic auth if not explicitly mentioned but implied by "app"
@@ -69,5 +70,8 @@ export function analyzeIdeaLocally(text: string): AIAnalysis {
         risk_level: risk,
         admin_panel_required: features.includes('admin_dashboard') || complexity === 'advanced',
         ai_features_required: features.includes('ai_recommendations'),
+        confidence: 0.5, // Low confidence for heuristic fallback
+        classificationSource: 'heuristic',
+        reasoning: 'Heuristic analysis based on keyword matching.',
     };
 }

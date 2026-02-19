@@ -1,6 +1,6 @@
 // AI Analysis Types
 export interface AIAnalysis {
-    project_type: 'website' | 'mobile_app' | 'web_and_app' | 'enterprise' | 'ai_product' | 'startup_product';
+    project_type: 'website' | 'mobile_app' | 'web_and_app' | 'enterprise' | 'ai_product' | 'startup_product' | 'mobile-app' | 'business-website' | 'website-mobile-app' | 'enterprise-software' | 'ai-powered-product' | 'startup-product';
     platforms: ('web' | 'android' | 'ios')[];
     idea_domain: string;
     required_features: string[];
@@ -11,6 +11,11 @@ export interface AIAnalysis {
     ai_features_required: boolean;
     strategic_insights?: string; // New field for detailed AI insights
     recommended_stack?: string[]; // New field for tech stack suggestions
+
+    // Production-Grade Reliability Fields
+    confidence?: number; // 0.0 to 1.0
+    classificationSource?: 'ai' | 'heuristic' | 'heuristic_emergency';
+    reasoning?: string;
 }
 
 export interface FeatureMapping {
@@ -125,5 +130,12 @@ export const PROJECT_TYPE_COSTS = {
     web_and_app: 12000,
     enterprise: 25000,
     ai_product: 15000,
-    startup_product: 6000
+    startup_product: 6000,
+    // New types mapping
+    'business-website': 4000,
+    'mobile-app': 8000,
+    'website-mobile-app': 12000,
+    'enterprise-software': 25000,
+    'ai-powered-product': 15000,
+    'startup-product': 6000
 };

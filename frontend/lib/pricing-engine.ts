@@ -17,6 +17,7 @@ import {
     getComplexityMultiplier,
     getRiskBuffer,
     DEFAULT_CONFIG,
+    TECH_MULTIPLIERS,
 } from './pricing-data';
 import {
     HOURLY_RATES,
@@ -69,7 +70,27 @@ export function calculateInternalCost(inputs: CalculationInputs, config: Pricing
     }
 
     // Get base hours for the idea type
-    const baseHours = config.baseIdeaHours ? config.baseIdeaHours[inputs.ideaType] : BASE_IDEA_HOURS[inputs.ideaType];
+    let baseHours = config.baseIdeaHours ? config.baseIdeaHours[inputs.ideaType] : BASE_IDEA_HOURS[inputs.ideaType];
+
+    // Fallback logic for legacy keys (e.g. 'enterprise software' vs 'enterprise-software')
+    if (!baseHours && config.baseIdeaHours) {
+        // Try to find key that matches loosely if exact match failed
+        const ideaTypeStr = inputs.ideaType!;
+        const looseKey = Object.keys(config.baseIdeaHours).find(k => k.replace(/\s+/g, '-') === ideaTypeStr || k === ideaTypeStr.replace(/-/g, ' '));
+        if (looseKey) {
+            baseHours = config.baseIdeaHours[looseKey as keyof typeof config.baseIdeaHours];
+        }
+    }
+
+    // Final fallback to local constants
+    if (!baseHours) {
+        baseHours = BASE_IDEA_HOURS[inputs.ideaType];
+    }
+
+    if (!baseHours) {
+        console.warn(`[PricingEngine] No base hours found for idea type in internal cost: ${inputs.ideaType}`);
+        baseHours = { frontend: 0, backend: 0, designer: 0, qa: 0, pm: 0 };
+    }
 
     // Get feature hours
     const featureHours = calculateFeatureHours(inputs.selectedFeatures);
@@ -103,8 +124,20 @@ export function calculateInternalCost(inputs: CalculationInputs, config: Pricing
         complexityMultiplier = Math.max(complexityMultiplier, levelMultiplier);
     }
 
-    // Apply tech stack multiplier to hours (harder tech = more time)
-    const techMultiplier = inputs.techStack ? config.techMultipliers[inputs.techStack] : 1.0;
+    // Apply    // Tech multiplier - use maximum from selected tech stacks
+    let techMultiplier = 1.0;
+    const techMultipliersMap = config.techMultipliers || TECH_MULTIPLIERS || {};
+
+    if (Array.isArray(inputs.techStack) && inputs.techStack.length > 0) {
+        const stackMultipliers = inputs.techStack.map(tech => {
+            if (!tech) return 1.0;
+            return techMultipliersMap[tech] || 1.0;
+        });
+
+        if (stackMultipliers.length > 0) {
+            techMultiplier = Math.max(...stackMultipliers);
+        }
+    }
 
     // Determine multipliers
     // "if more hard number of people working can be increased" -> Scale Hours
@@ -228,7 +261,29 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
     }
 
     // 1. Calculate Base Hours
-    const baseHoursObj = config.baseIdeaHours ? config.baseIdeaHours[inputs.ideaType] : BASE_IDEA_HOURS[inputs.ideaType];
+    let baseHoursObj = config.baseIdeaHours ? config.baseIdeaHours[inputs.ideaType] : BASE_IDEA_HOURS[inputs.ideaType];
+
+    // Fallback logic for legacy keys (e.g. 'enterprise software' vs 'enterprise-software')
+    if (!baseHoursObj && config.baseIdeaHours) {
+        // Try to find key that matches loosely if exact match failed
+        const ideaTypeStr = inputs.ideaType!;
+        const looseKey = Object.keys(config.baseIdeaHours).find(k => k.replace(/\s+/g, '-') === ideaTypeStr || k === ideaTypeStr.replace(/-/g, ' '));
+        if (looseKey) {
+            baseHoursObj = config.baseIdeaHours[looseKey as keyof typeof config.baseIdeaHours];
+        }
+    }
+
+    // Final fallback to local constants
+    if (!baseHoursObj) {
+        baseHoursObj = BASE_IDEA_HOURS[inputs.ideaType];
+    }
+
+    if (!baseHoursObj) {
+        console.warn(`[PricingEngine] No base hours found for idea type: ${inputs.ideaType}`);
+        // Return fallback to prevent crash
+        baseHoursObj = { frontend: 0, backend: 0, designer: 0, qa: 0, pm: 0 };
+    }
+
     const baseHoursTotal = Object.values(baseHoursObj).reduce((sum, h) => sum + h, 0);
 
     // 2. Calculate Feature Hours
@@ -241,10 +296,21 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
         ? config.formatMultipliers[inputs.productFormat]
         : 1.0;
 
-    // Tech multiplier
-    const techMultiplier = inputs.techStack
-        ? config.techMultipliers[inputs.techStack]
-        : 1.0;
+    // Tech multiplier - use maximum from selected tech stacks
+    let techMultiplier = 1.0;
+    const techMultipliersMap = config.techMultipliers || TECH_MULTIPLIERS || {};
+
+    if (Array.isArray(inputs.techStack) && inputs.techStack.length > 0) {
+        const stackMultipliers = inputs.techStack.map(tech => {
+            // Check if tech exists in map, if not try to fallback or default to 1.0
+            if (!tech) return 1.0;
+            return techMultipliersMap[tech] || 1.0;
+        });
+
+        if (stackMultipliers.length > 0) {
+            techMultiplier = Math.max(...stackMultipliers);
+        }
+    }
 
     // Complexity multiplier
     let complexityMultiplier = getComplexityMultiplier(inputs.selectedFeatures.length);
@@ -261,9 +327,26 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
     // DAMPENER: If multiple high multipliers exist, dampen them slightly to avoid explosion.
     let combinedMultiplier = formatMultiplier * techMultiplier * complexityMultiplier * timelineMultiplier;
     // Cap combined multiplier to sensible limit (e.g., 3.5x max) unless valid heavy enterprise
-    if (inputs.ideaType !== 'enterprise software') {
+    if (inputs.ideaType !== 'enterprise-software') {
         combinedMultiplier = Math.min(combinedMultiplier, 3.5);
     }
+
+    // 4.1. Apply Risk Multiplier (Production Grade)
+    let riskMultiplier = 1.0;
+    if (inputs.confidence !== undefined) {
+        if (inputs.confidence < 0.5) {
+            riskMultiplier += 0.20; // 20% buffer for very low confidence
+        } else if (inputs.confidence < 0.7) {
+            riskMultiplier += 0.10; // 10% buffer for moderate confidence
+        }
+    }
+
+    // Extra buffer for heuristic fallback
+    if (inputs.classificationSource === 'heuristic' || inputs.classificationSource === 'heuristic_emergency') {
+        riskMultiplier += 0.15;
+    }
+
+    combinedMultiplier *= riskMultiplier;
 
     const adjustedDevHours = (baseHoursTotal + featureHoursTotal) * combinedMultiplier;
 
@@ -271,7 +354,12 @@ export function calculateClientPrice(inputs: CalculationInputs, config: PricingC
     // Use dynamic rate based on Idea Type (Startup=Low, Enterprise=High)
     // Fallback to configured rate or constant
     const DYNAMIC_RATES = (config as any).DYNAMIC_HOURLY_RATES || DYNAMIC_HOURLY_RATES;
-    let hourlyRate = DYNAMIC_RATES[inputs.ideaType] || config.clientHourlyRate || 100;
+    let hourlyRate = DYNAMIC_RATES[inputs.ideaType] || config.clientHourlyRate;
+    if (!hourlyRate) {
+        console.error(`[PricingEngine] No hourly rate found for idea type: ${inputs.ideaType}. Using minimum safe rate.`);
+        // Use the minimum rate from DYNAMIC_RATES as a safe floor rather than a magic number
+        hourlyRate = Math.min(...Object.values(DYNAMIC_RATES as Record<string, number>).filter(v => v > 0));
+    }
 
     // 6. Calculate Development Cost (The Build Price)
     const devCost = adjustedDevHours * hourlyRate;
@@ -472,8 +560,8 @@ export function calculateTimeline(inputs: CalculationInputs, internalCost: Inter
 /**
  * Generate client-facing cost breakdown (business-friendly labels)
  */
-export function generateClientCostBreakdown(internalCost: InternalCost): CostBreakdown[] {
-    const total = internalCost.totalInternalCost;
+export function generateClientCostBreakdown(internalCost: InternalCost, totalClientPrice?: number): CostBreakdown[] {
+    const internalTotal = internalCost.totalInternalCost;
 
     // Map internal costs to client-friendly categories
     const frontend = internalCost.laborCosts.find(r => r.role === 'frontend')?.totalCost || 0;
@@ -486,63 +574,89 @@ export function generateClientCostBreakdown(internalCost: InternalCost): CostBre
     const security = internalCost.laborCosts.find(r => r.role === 'security')?.totalCost || 0;
     const infraLabor = internalCost.laborCosts.find(r => r.role === 'infrastructure')?.totalCost || 0;
     const supportLabor = internalCost.laborCosts.find(r => r.role === 'support')?.totalCost || 0;
+    const infraTotal = infraLabor + internalCost.infrastructureCost;
+    const supportTotal = supportLabor + internalCost.riskBuffer;
+
+    // Raw internal amounts per category
+    const rawAmounts = [frontend, designer, backend, qa, security, pm, infraTotal, supportTotal];
+    const rawSum = rawAmounts.reduce((s, v) => s + v, 0);
+
+    // If a client price is provided, scale all amounts so they sum to the client price.
+    // This ensures the breakdown always matches the quoted estimate.
+    const scalingFactor = (totalClientPrice && rawSum > 0)
+        ? totalClientPrice / rawSum
+        : 1;
+
+    // Scale amounts
+    const scaled = rawAmounts.map(v => Math.round(v * scalingFactor));
+
+    // Fix rounding drift: adjust the largest bucket so the sum is exact
+    if (totalClientPrice) {
+        const scaledSum = scaled.reduce((s, v) => s + v, 0);
+        const diff = Math.round(totalClientPrice) - scaledSum;
+        if (diff !== 0) {
+            // Add the rounding difference to the largest category
+            const maxIdx = scaled.indexOf(Math.max(...scaled));
+            scaled[maxIdx] += diff;
+        }
+    }
+
+    const displayTotal = totalClientPrice || rawSum;
 
     return [
         {
             label: CLIENT_COST_CATEGORIES[0].label, // Product Engineering
-            percentage: Math.round((frontend / total) * 100),
-            amount: Math.round(frontend),
+            percentage: Math.round((scaled[0] / displayTotal) * 100),
+            amount: scaled[0],
             color: CLIENT_COST_CATEGORIES[0].color,
             description: CLIENT_COST_CATEGORIES[0].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[1].label, // UX & Design
-            percentage: Math.round((designer / total) * 100),
-            amount: Math.round(designer),
+            percentage: Math.round((scaled[1] / displayTotal) * 100),
+            amount: scaled[1],
             color: CLIENT_COST_CATEGORIES[1].color,
             description: CLIENT_COST_CATEGORIES[1].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[2].label, // Business Logic
-            percentage: Math.round((backend / total) * 100),
-            amount: Math.round(backend),
+            percentage: Math.round((scaled[2] / displayTotal) * 100),
+            amount: scaled[2],
             color: CLIENT_COST_CATEGORIES[2].color,
             description: CLIENT_COST_CATEGORIES[2].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[3].label, // Quality
-            percentage: Math.round((qa / total) * 100),
-            amount: Math.round(qa),
+            percentage: Math.round((scaled[3] / displayTotal) * 100),
+            amount: scaled[3],
             color: CLIENT_COST_CATEGORIES[3].color,
             description: CLIENT_COST_CATEGORIES[3].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[4].label, // Security & Data
-            percentage: Math.round((security / total) * 100),
-            amount: Math.round(security),
+            percentage: Math.round((scaled[4] / displayTotal) * 100),
+            amount: scaled[4],
             color: CLIENT_COST_CATEGORIES[4].color,
             description: CLIENT_COST_CATEGORIES[4].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[5].label, // PM
-            percentage: Math.round((pm / total) * 100),
-            amount: Math.round(pm),
+            percentage: Math.round((scaled[5] / displayTotal) * 100),
+            amount: scaled[5],
             color: CLIENT_COST_CATEGORIES[5].color,
             description: CLIENT_COST_CATEGORIES[5].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[6].label, // Infrastructure & Tools
-            // Includes labor + actual server costs
-            percentage: Math.round(((infraLabor + internalCost.infrastructureCost) / total) * 100),
-            amount: Math.round(infraLabor + internalCost.infrastructureCost),
+            percentage: Math.round((scaled[6] / displayTotal) * 100),
+            amount: scaled[6],
             color: CLIENT_COST_CATEGORIES[6].color,
             description: CLIENT_COST_CATEGORIES[6].description,
         },
         {
             label: CLIENT_COST_CATEGORIES[7].label, // Support & Risk
-            // Includes support labor + risk buffer
-            percentage: Math.round(((supportLabor + internalCost.riskBuffer) / total) * 100),
-            amount: Math.round(supportLabor + internalCost.riskBuffer),
+            percentage: Math.round((scaled[7] / displayTotal) * 100),
+            amount: scaled[7],
             color: CLIENT_COST_CATEGORIES[7].color,
             description: CLIENT_COST_CATEGORIES[7].description,
         },

@@ -20,11 +20,14 @@ export default function Home() {
     const [aiAnalysis, setAIAnalysis] = useState<AIAnalysis | null>(null);
     const [showAIReview, setShowAIReview] = useState(false);
     const showResults = usePricingStore((state) => state.showResults);
+    const aiMode = usePricingStore((state) => state.aiMode);
+    const resetStore = usePricingStore((state) => state.reset);
     const populateFromAI = usePricingStore((state) => state.populateFromAI);
     const resultsRef = useRef<HTMLDivElement>(null);
 
     const handleStartAI = () => {
         console.log('AI button clicked');
+        resetStore(); // Clear previous state
         setFlowMode('ai');
         // Scroll to content
         setTimeout(() => {
@@ -34,6 +37,7 @@ export default function Home() {
 
     const handleStartManual = () => {
         console.log('Manual button clicked');
+        resetStore(); // Clear previous state
         setFlowMode('manual');
         // Scroll to content
         setTimeout(() => {
@@ -80,8 +84,8 @@ export default function Home() {
             {/* Hero - Always shown */}
             <HeroSection onStartAI={handleStartAI} onStartManual={handleStartManual} />
 
-            {/* AI Flow */}
-            {flowMode === 'ai' && !showAIReview && !showResults && (
+            {/* AI Flow: Input only shown if not in review, no results, and NOT already analyzed (edit mode) */}
+            {flowMode === 'ai' && !showAIReview && !showResults && !aiMode && (
                 <IdeaInput
                     onAnalysisComplete={handleAIAnalysisComplete}
                     onSkip={handleSkipAI}
@@ -97,8 +101,9 @@ export default function Home() {
                 />
             )}
 
-            {/* Manual Flow */}
-            {flowMode === 'manual' && (
+            {/* Manual Flow OR AI Edit Mode (Wizard View) */}
+            {/* Show wizard if Manual Mode OR (AI Mode + Edit Enabled) */}
+            {(flowMode === 'manual' || (flowMode === 'ai' && aiMode && !showResults)) && (
                 <>
                     {/* Project Description */}
                     <ProjectDescription />

@@ -3,6 +3,8 @@ import { calculateInternalCost, calculateClientPrice, calculateProfit } from '@/
 import { dbConnect } from '@/lib/db';
 import { User, Project } from '@/lib/models';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Fetch KPIs for company head dashboard
 // We recalculate these on-the-fly to ensure latest pricing formulas are applied to all stored projects
 export async function GET() {

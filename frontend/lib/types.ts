@@ -5,7 +5,7 @@ export type IdeaType =
     | 'mobile-app'
     | 'website-mobile-app'
     | 'startup-product'
-    | 'enterprise software'
+    | 'enterprise-software'
     | 'ai-powered-product';
 
 export type ProductFormat =
@@ -61,11 +61,15 @@ export interface Feature {
 export interface CalculationInputs {
     ideaType: IdeaType | null;
     productFormat: ProductFormat | null;
-    techStack: TechStack | null;
+    techStack: TechStack[]; // Changed to array for multiple selection
     selectedFeatures: string[];
     deliverySpeed: DeliverySpeed;
     supportDuration: SupportDuration;
     complexityLevel?: 'basic' | 'medium' | 'advanced';
+
+    // AI Metadata for Risk Adjustment
+    confidence?: number;
+    classificationSource?: 'ai' | 'heuristic' | 'heuristic_emergency';
 }
 
 // Full inputs including metadata

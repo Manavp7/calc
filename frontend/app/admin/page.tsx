@@ -9,25 +9,56 @@ import {
     Users,
     TrendingUp,
     Shield,
-    LogOut
+    LogOut,
+    Activity,
+    Clock,
+    DollarSign,
+    CheckCircle,
+    AlertTriangle,
+    XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import StarField from '@/components/three/StarField';
 
+interface RecentProject {
+    _id: string;
+    clientName?: string;
+    companyName?: string;
+    clientEmail?: string;
+    createdAt: string;
+    inputs?: {
+        ideaType?: string;
+        productFormat?: string;
+    };
+    profitAnalysis?: {
+        clientPrice: number;
+        profitMargin: number;
+        healthStatus: string;
+    };
+}
+
 export default function AdminDashboard() {
     const { data: session } = useSession();
     const [kpiData, setKpiData] = useState<any>(null);
+    const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchKPIs = async () => {
+        const fetchData = async () => {
             try {
-                // Reuse company-head KPIs as it's the same data
-                const response = await fetch('/api/company-head/kpis');
-                if (response.ok) {
-                    const data = await response.json();
+                const [kpiRes, projectsRes] = await Promise.all([
+                    fetch('/api/company-head/kpis'),
+                    fetch('/api/admin/projects?limit=8'),
+                ]);
+
+                if (kpiRes.ok) {
+                    const data = await kpiRes.json();
                     setKpiData(data);
+                }
+                if (projectsRes.ok) {
+                    const data = await projectsRes.json();
+                    setRecentProjects(data.projects || []);
                 }
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -36,12 +67,15 @@ export default function AdminDashboard() {
             }
         };
 
-        fetchKPIs();
+        fetchData();
     }, []);
 
     const handleLogout = () => {
         signOut({ callbackUrl: '/' });
     };
+
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
 
     const adminTools = [
         {
@@ -73,7 +107,7 @@ export default function AdminDashboard() {
         },
         {
             title: 'User Management',
-            description: 'Manage user accounts, roles, and permissions',
+            description: 'Manage user accounts, roles, and create new company heads',
             icon: Users,
             href: '/admin/users',
             color: 'from-orange-500 to-red-500',
@@ -99,6 +133,19 @@ export default function AdminDashboard() {
             borderColor: 'border-red-500/20',
         },
     ];
+
+    const healthIcon = (status: string) => {
+        if (status === 'healthy') return <CheckCircle className="w-4 h-4 text-green-400" />;
+        if (status === 'warning') return <AlertTriangle className="w-4 h-4 text-yellow-400" />;
+        return <XCircle className="w-4 h-4 text-red-400" />;
+    };
+
+    const healthBadge = (status: string) => {
+        const base = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide';
+        if (status === 'healthy') return `${base} bg-green-500/10 text-green-400 border border-green-500/20`;
+        if (status === 'warning') return `${base} bg-yellow-500/10 text-yellow-400 border border-yellow-500/20`;
+        return `${base} bg-red-500/10 text-red-400 border border-red-500/20`;
+    };
 
     return (
         <div className="min-h-screen bg-black relative overflow-x-hidden">
@@ -158,7 +205,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="text-center">
                             <p className="text-4xl font-bold gradient-text mb-2">
-                                {loading ? '-' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(kpiData?.overview?.totalQuotedValue || 0)}
+                                {loading ? '-' : formatCurrency(kpiData?.overview?.totalQuotedValue || 0)}
                             </p>
                             <p className="text-gray-400 text-sm">Total Value</p>
                         </div>
@@ -169,6 +216,103 @@ export default function AdminDashboard() {
                             <p className="text-gray-400 text-sm">Avg Margin</p>
                         </div>
                     </div>
+                </motion.div>
+
+                {/* Recent Client Submissions */}
+                <motion.div
+                    className="glass rounded-2xl p-8 mb-8"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold flex items-center gap-3">
+                            <Activity className="w-6 h-6 text-primary-400" />
+                            Recent Client Submissions
+                        </h2>
+                        <Link
+                            href="/admin/database"
+                            className="text-sm text-primary-400 hover:text-primary-300 transition-colors font-medium"
+                        >
+                            View All →
+                        </Link>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex justify-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-400" />
+                        </div>
+                    ) : recentProjects.length === 0 ? (
+                        <div className="text-center py-12 text-gray-500">
+                            <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                            <p>No client submissions yet. They'll appear here automatically.</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b border-white/10 text-gray-500 text-xs uppercase tracking-wider">
+                                        <th className="text-left py-3 px-4">Client</th>
+                                        <th className="text-left py-3 px-4">Project Type</th>
+                                        <th className="text-right py-3 px-4">Quote Value</th>
+                                        <th className="text-right py-3 px-4">Margin</th>
+                                        <th className="text-center py-3 px-4">Health</th>
+                                        <th className="text-right py-3 px-4">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {recentProjects.map((project, index) => (
+                                        <motion.tr
+                                            key={project._id}
+                                            className="hover:bg-white/5 transition-all group"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.3 + index * 0.04 }}
+                                        >
+                                            <td className="py-4 px-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                                        {(project.clientName || 'A').charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-medium text-white group-hover:text-primary-400 transition-colors">
+                                                            {project.clientName || 'Anonymous'}
+                                                        </p>
+                                                        {project.clientEmail && (
+                                                            <p className="text-xs text-gray-500">{project.clientEmail}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-4 text-gray-300 text-sm capitalize">
+                                                {project.inputs?.ideaType?.replace(/-/g, ' ') || '—'}
+                                            </td>
+                                            <td className="py-4 px-4 text-right text-white font-medium">
+                                                {formatCurrency(project.profitAnalysis?.clientPrice || 0)}
+                                            </td>
+                                            <td className="py-4 px-4 text-right">
+                                                <span className={`font-mono text-sm ${(project.profitAnalysis?.profitMargin || 0) < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                                    {(project.profitAnalysis?.profitMargin || 0).toFixed(1)}%
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 text-center">
+                                                <span className={healthBadge(project.profitAnalysis?.healthStatus || 'unknown')}>
+                                                    {healthIcon(project.profitAnalysis?.healthStatus || '')}
+                                                    {project.profitAnalysis?.healthStatus || 'unknown'}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 text-right text-gray-400 text-sm">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {new Date(project.createdAt).toLocaleDateString()}
+                                                </div>
+                                            </td>
+                                        </motion.tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </motion.div>
 
                 {/* Admin Tools Grid */}
@@ -185,7 +329,7 @@ export default function AdminDashboard() {
                                 key={tool.title}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 * (index + 2) }}
+                                transition={{ delay: 0.1 * (index + 3) }}
                             >
                                 {isAvailable ? (
                                     <Link href={tool.href}>
@@ -235,16 +379,16 @@ export default function AdminDashboard() {
                     className="glass rounded-2xl p-8 mt-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
+                    transition={{ delay: 0.9 }}
                 >
                     <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <Link href="/admin/pricing-analysis" className="btn-primary text-center">
                             View Pricing Analysis
                         </Link>
-                        <button className="btn-secondary opacity-50 cursor-not-allowed" disabled>
-                            Export Reports
-                        </button>
+                        <Link href="/admin/users" className="btn-secondary text-center">
+                            Manage Users
+                        </Link>
                         <Link href="/admin/config" className="btn-secondary text-center">
                             System Settings
                         </Link>

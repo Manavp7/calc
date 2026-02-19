@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ClientPrice, Timeline, CostBreakdown, PricingInputs } from './types';
-import { ROLE_LABELS } from './constants';
+import { ROLE_LABELS, PRODUCT_FORMATS, TECH_STACKS, FEATURE_GROUPS } from './constants';
 
 export function generatePricingPDF(
     inputs: PricingInputs,
@@ -251,18 +251,45 @@ export function generatePricingPDF(
     doc.text('Project Specification', 15, yPos);
     yPos += 10;
 
+    // --- Lookup helpers ---
     const formatValue = (val: string | undefined) => {
         if (!val) return 'Not specified';
         return val.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     };
 
+    // Product format: show title + description (e.g. "Full Ecosystem — App + Web + Admin")
+    const productFormatObj = PRODUCT_FORMATS.find(f => f.id === inputs.productFormat);
+    const productFormatLabel = productFormatObj
+        ? `${productFormatObj.title} — ${productFormatObj.description}`
+        : formatValue(inputs.productFormat ?? undefined);
+
+    // Tech stack: map IDs to human-readable titles
+    const techStackLabels = inputs.techStack && inputs.techStack.length > 0
+        ? inputs.techStack.map(id => {
+            const found = TECH_STACKS.find(t => t.id === id);
+            return found ? `${found.title} (${found.description})` : id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        })
+        : [];
+    const techStackString = techStackLabels.length > 0
+        ? techStackLabels.join('\n')
+        : 'Not specified';
+
+    // Selected features: look up names from FEATURE_GROUPS
+    const allFeatures = Object.values(FEATURE_GROUPS).flatMap(g => g.features);
+    const featureNames = inputs.selectedFeatures.length > 0
+        ? inputs.selectedFeatures.map(id => {
+            const f = allFeatures.find(feat => feat.id === id);
+            return f ? `• ${f.name} — ${f.description}` : `• ${id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`;
+        })
+        : ['None selected'];
+
     const details = [
         ['Idea Type', formatValue(inputs.ideaType ?? undefined)],
-        ['Product Format', formatValue(inputs.productFormat ?? undefined)],
-        ['Technology Stack', formatValue(inputs.techStack ?? undefined)],
+        ['Product Format', productFormatLabel],
+        ['Technology Stack', techStackString],
         ['Delivery Speed', formatValue(inputs.deliverySpeed ?? undefined)],
         ['Support Duration', formatValue(inputs.supportDuration ?? undefined)],
-        ['Features Selected', inputs.selectedFeatures.length.toString()]
+        [`Features Selected (${inputs.selectedFeatures.length})`, featureNames.join('\n')],
     ];
 
     autoTable(doc, {
@@ -270,14 +297,14 @@ export function generatePricingPDF(
         body: details,
         theme: 'plain',
         styles: {
-            fontSize: 10,
+            fontSize: 9,
             cellPadding: 4,
             lineColor: [229, 231, 235],
-            lineWidth: 0.1
+            lineWidth: 0.1,
         },
         columnStyles: {
-            0: { fontStyle: 'bold', cellWidth: 50 },
-            1: { cellWidth: 130 }
+            0: { fontStyle: 'bold', cellWidth: 55 },
+            1: { cellWidth: 125 }
         },
         margin: { left: 15 }
     });

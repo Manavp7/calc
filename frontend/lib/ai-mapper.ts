@@ -8,42 +8,48 @@ export function mapAIOutputToPricingInputs(aiData: AIAnalysis): Partial<PricingI
     const inputs: Partial<PricingInputs> = {};
 
     // Map project type to idea type and product format
-    switch (aiData.project_type) {
-        case 'website':
+    // Map project type to idea type and product format
+    const pType = aiData.project_type;
+    switch (true) {
+        case pType === 'website' || pType === 'business-website':
             inputs.ideaType = 'business-website';
             inputs.productFormat = 'website' as ProductFormat;
             break;
-        case 'mobile_app':
+        case pType === 'mobile_app' || pType === 'mobile-app':
             inputs.ideaType = 'mobile-app';
             inputs.productFormat = 'mobile-app' as ProductFormat;
             break;
-        case 'web_and_app':
+        case pType === 'web_and_app' || pType === 'website-mobile-app':
             inputs.ideaType = 'website-mobile-app';
             inputs.productFormat = 'website-and-app' as ProductFormat;
             break;
-        case 'enterprise':
-            inputs.ideaType = 'enterprise software';
+        case pType === 'enterprise' || pType === 'enterprise-software':
+            inputs.ideaType = 'enterprise-software';
             inputs.productFormat = 'full-ecosystem' as ProductFormat;
             break;
-        case 'ai_product':
+        case pType === 'ai_product' || pType === 'ai-powered-product':
             inputs.ideaType = 'ai-powered-product';
             inputs.productFormat = 'full-ecosystem' as ProductFormat;
             break;
-        case 'startup_product':
+        case pType === 'startup_product' || pType === 'startup-product':
             inputs.ideaType = 'startup-product';
             inputs.productFormat = 'website-and-app' as ProductFormat;
             break;
+        default:
+            // Fallback if unknown
+            inputs.ideaType = 'startup-product';
+            inputs.productFormat = 'website' as ProductFormat;
     }
 
     // Map platforms to tech stack
     if (aiData.platforms.includes('web')) {
-        inputs.techStack = 'react-nextjs' as TechStack;
+        inputs.techStack = ['react-nextjs'];
     } else if (aiData.platforms.includes('android') && aiData.platforms.includes('ios')) {
-        inputs.techStack = 'react-native' as TechStack;
+        inputs.techStack = ['react-native'];
     } else if (aiData.platforms.includes('android')) {
-        inputs.techStack = 'native-android' as TechStack;
+        inputs.techStack = ['native-android'];
     } else if (aiData.platforms.includes('ios')) {
-        inputs.techStack = 'native-ios' as TechStack;
+        inputs.techStack = ['native-ios'];
     }
 
     // Map features using smart selection logic
@@ -189,7 +195,34 @@ function normalizeAIFeatures(aiFeatures: string[]): string[] {
         'compliance': 'compliance'
     };
 
-    return aiFeatures.map(f => mapping[f] || f); // Fallback to original if no mapping found (e.g. valid kebab)
+    // List of valid frontend IDs from pricing-data
+    const validFrontendIDs = [
+        'user-accounts', 'social-login', 'content-management', 'search', 'file-uploads',
+        'payments', 'subscriptions', 'analytics', 'booking-system', 'invoicing', 'reporting',
+        'notifications', 'chat', 'ai-recommendations', 'email-marketing', 'video-calls', 'reviews-ratings',
+        'admin-control', 'data-security', 'backups', 'compliance'
+    ];
+
+    return aiFeatures.map(f => {
+        // 1. Direct match
+        if (mapping[f]) return mapping[f];
+
+        // 2. Case-insensitive / format-insensitive match
+        // "User Accounts" -> "useraccounts"
+        const cleanInput = f.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        // Check against mapping keys
+        for (const [key, value] of Object.entries(mapping)) {
+            if (key.replace(/_/g, '') === cleanInput) return value;
+        }
+
+        // Check against valid frontend IDs
+        const matchedID = validFrontendIDs.find(id => id.replace(/-/g, '') === cleanInput);
+        if (matchedID) return matchedID;
+
+        // 3. Fallback: return original (might work if it's already exact)
+        return f;
+    });
 }
 
 /**

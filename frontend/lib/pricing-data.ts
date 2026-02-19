@@ -287,10 +287,11 @@ export const BASE_IDEA_COSTS: Record<IdeaType, number> = {
     'mobile-app': 25000,
     'website-mobile-app': 40000,
     'startup-product': 50000,
-    'enterprise software': 100000,
+    'enterprise-software': 100000,
     'ai-powered-product': 80000,
 };
 
+// Base hours for different idea types (foundation work)
 // Base hours for different idea types (foundation work)
 export const BASE_IDEA_HOURS: Record<IdeaType, {
     frontend: number;
@@ -300,46 +301,46 @@ export const BASE_IDEA_HOURS: Record<IdeaType, {
     pm: number;
 }> = {
     'business-website': {
-        frontend: 80,
-        backend: 40,
-        designer: 60,
-        qa: 30,
-        pm: 20,
+        frontend: 45,  // Total 150
+        backend: 50,
+        designer: 30,
+        qa: 15,
+        pm: 10,
     },
     'mobile-app': {
-        frontend: 120,
-        backend: 80,
-        designer: 80,
-        qa: 50,
+        frontend: 150, // Total 500
+        backend: 150,
+        designer: 100,
+        qa: 70,
         pm: 30,
     },
     'website-mobile-app': {
-        frontend: 230,
-        backend: 150,
-        designer: 130,
-        qa: 90,
+        frontend: 220, // Total 750
+        backend: 230,
+        designer: 150,
+        qa: 100,
         pm: 50,
     },
     'startup-product': {
-        frontend: 220,
-        backend: 170,
-        designer: 120,
-        qa: 90,
-        pm: 50,
+        frontend: 250, // Total 900
+        backend: 300,
+        designer: 150,
+        qa: 120,
+        pm: 80,
     },
-    'enterprise software': {
-        frontend: 300,
+    'enterprise-software': {
+        frontend: 300, // Total 1120
         backend: 350,
         designer: 150,
         qa: 200,
         pm: 120,
     },
     'ai-powered-product': {
-        frontend: 120,
-        backend: 180,
-        designer: 80,
-        qa: 80,
-        pm: 40,
+        frontend: 350, // Total 1250
+        backend: 450,
+        designer: 150,
+        qa: 200,
+        pm: 100,
     },
 };
 
@@ -378,7 +379,7 @@ export const INFRASTRUCTURE_COSTS: Record<IdeaType, number> = {
     'mobile-app': 150,
     'website-mobile-app': 250,
     'startup-product': 400,
-    'enterprise software': 2000,
+    'enterprise-software': 2000,
     'ai-powered-product': 600,
 };
 

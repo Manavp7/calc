@@ -1,12 +1,25 @@
 
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { dbConnect } from '@/lib/db';
 import { User } from '@/lib/models';
 import bcrypt from 'bcryptjs';
 
 export async function GET(request: NextRequest) {
     try {
+        // Auth guard — only admin or company_head can view users
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         await dbConnect();
+
+        const requestingUser = await User.findOne({ email: session.user.email });
+        if (!requestingUser || (requestingUser.role !== 'admin' && requestingUser.role !== 'company_head')) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
 
         // Fetch all users sorted by creation date
         const users = await User.find({}).sort({ createdAt: -1 }).select('-password');
@@ -23,6 +36,19 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
+        // Auth guard — only admin can create users
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        await dbConnect();
+
+        const requestingUser = await User.findOne({ email: session.user.email });
+        if (!requestingUser || requestingUser.role !== 'admin') {
+            return NextResponse.json({ error: 'Forbidden: Only admins can create users' }, { status: 403 });
+        }
+
         const body = await request.json();
         const { name, email, password, role } = body;
 
@@ -34,7 +60,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        await dbConnect();
+        // Only allow creating company_head or admin roles
+        if (!['company_head', 'admin'].includes(role)) {
+            return NextResponse.json(
+                { error: 'Invalid role. Only company_head or admin can be created here.' },
+                { status: 400 }
+            );
+        }
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });

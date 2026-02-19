@@ -27,6 +27,7 @@ export const IDEA_TYPES = [
         icon: '💡',
     },
     {
+        id: 'enterprise-software' as IdeaType,
         title: 'Enterprise Software',
         description: 'Large scale business solution',
         icon: '🏢',
@@ -286,7 +287,7 @@ export const DYNAMIC_HOURLY_RATES: Record<string, number> = {
     'mobile-app': 60,
     'website-mobile-app': 75,
     'ai-powered-product': 95,
-    'enterprise software': 150,
+    'enterprise-software': 150,
 };
 
 // Sanity Caps (Circuit Breakers)
@@ -296,7 +297,7 @@ export const MAX_PRICE_CAPS: Record<string, number> = {
     'mobile-app': 100000,
     'website-mobile-app': 120000,
     'ai-powered-product': 150000,
-    // Enterprise has no hard cap, but we rely on the rate
+    'enterprise-software': 500000,
 };
 
 // Export pricing constants for database seeding
@@ -305,7 +306,7 @@ export const IDEA_COSTS: Record<IdeaType, number> = {
     'mobile-app': 25000,
     'website-mobile-app': 40000,
     'startup-product': 50000,
-    'enterprise software': 100000,
+    'enterprise-software': 100000,
     'ai-powered-product': 80000,
 };
 

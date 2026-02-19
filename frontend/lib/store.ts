@@ -52,7 +52,7 @@ interface PricingState {
     setProjectDescription: (description: string) => void;
     setIdeaType: (ideaType: IdeaType) => void;
     setProductFormat: (format: ProductFormat) => void;
-    setTechStack: (tech: TechStack) => void;
+    toggleTechStack: (tech: TechStack) => void;
     toggleFeature: (featureId: string) => void;
     setDeliverySpeed: (speed: DeliverySpeed) => void;
     setSupportDuration: (duration: SupportDuration) => void;
@@ -69,6 +69,7 @@ interface PricingState {
     populateFromAI: (analysis: AIAnalysis) => void;
     setLeadInfo: (info: { clientName: string; companyName: string; email: string; phone: string }) => void;
     analyzeProjectComplexity: () => Promise<void>;
+    enableEditMode: () => void;
 }
 
 const initialInputs: PricingInputs = {
@@ -79,7 +80,7 @@ const initialInputs: PricingInputs = {
     phone: '',
     ideaType: null,
     productFormat: null,
-    techStack: null,
+    techStack: [], // Changed to empty array for multi-select
     selectedFeatures: [],
     deliverySpeed: 'standard',
     supportDuration: 'none',
@@ -120,10 +121,17 @@ export const usePricingStore = create<PricingState>((set, get) => ({
         }));
     },
 
-    setTechStack: (tech) => {
-        set((state) => ({
-            inputs: { ...state.inputs, techStack: tech },
-        }));
+    toggleTechStack: (tech) => {
+        set((state) => {
+            const techStacks = state.inputs.techStack;
+            const newTechStacks = techStacks.includes(tech)
+                ? techStacks.filter((t) => t !== tech)
+                : [...techStacks, tech];
+
+            return {
+                inputs: { ...state.inputs, techStack: newTechStacks },
+            };
+        });
     },
 
     toggleFeature: (featureId) => {
@@ -158,6 +166,10 @@ export const usePricingStore = create<PricingState>((set, get) => ({
     calculateResults: () => {
         const { inputs, pricingConfig } = get();
 
+        console.log('=== CALCULATE RESULTS DEBUG ===');
+        console.log('Inputs:', inputs);
+        console.log('Pricing Config:', pricingConfig);
+
         // Calculate all results using loaded config or undefined (engine falls back to default)
         const configToUse = pricingConfig || undefined;
 
@@ -165,8 +177,12 @@ export const usePricingStore = create<PricingState>((set, get) => ({
         const internalCost = calculateInternalCost(inputs, configToUse);
         const profitAnalysis = calculateProfit(clientPrice, internalCost);
         const timeline = calculateTimeline(inputs, internalCost, configToUse);
-        const costBreakdown = generateClientCostBreakdown(internalCost);
+        const costBreakdown = generateClientCostBreakdown(internalCost, clientPrice.totalPrice);
         const riskWarnings = generateRiskWarnings(inputs, profitAnalysis, timeline);
+
+        console.log('Calculated clientPrice:', clientPrice);
+        console.log('Calculated timeline:', timeline);
+        console.log('=== END DEBUG ===');
 
         set({
             clientPrice,
@@ -221,7 +237,13 @@ export const usePricingStore = create<PricingState>((set, get) => ({
     populateFromAI: (analysis) => {
         const aiInputs = mapAIOutputToPricingInputs(analysis);
         set((state) => ({
-            inputs: { ...state.inputs, ...aiInputs },
+            inputs: {
+                ...state.inputs,
+                ...aiInputs,
+                // Map risk fields
+                confidence: analysis.confidence,
+                classificationSource: analysis.classificationSource
+            },
             aiAnalysis: analysis,
             aiMode: true,
         }));
@@ -278,5 +300,9 @@ export const usePricingStore = create<PricingState>((set, get) => ({
         } catch (error) {
             console.error('Failed to analyze complexity:', error);
         }
+    },
+
+    enableEditMode: () => {
+        set({ showResults: false });
     },
 }));
