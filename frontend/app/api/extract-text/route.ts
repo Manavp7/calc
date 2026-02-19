@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-// @ts-ignore
-const pdfParse = require('pdf-parse');
-import mammoth from 'mammoth';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'; // Ensure Node.js runtime for pdf-parse and mammoth
 
 export async function POST(req: NextRequest) {
     try {
@@ -15,19 +15,43 @@ export async function POST(req: NextRequest) {
         const buffer = Buffer.from(await file.arrayBuffer());
         let text = '';
 
-        if (file.type === 'application/pdf') {
+        const mimeType = file.type;
+        const fileName = file.name.toLowerCase();
+
+        if (mimeType === 'application/pdf' || fileName.endsWith('.pdf')) {
+            // Use require for pdf-parse (CommonJS module — no default export in ESM bundle)
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const pdfParse = require('pdf-parse');
             const pdfData = await pdfParse(buffer);
             text = pdfData.text;
-        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        } else if (
+            mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+            fileName.endsWith('.docx')
+        ) {
+            const mammoth = await import('mammoth');
             const result = await mammoth.extractRawText({ buffer });
             text = result.value;
         } else {
-            return NextResponse.json({ error: 'Unsupported file type. Please upload PDF or DOCX.' }, { status: 400 });
+            return NextResponse.json(
+                { error: 'Unsupported file type. Please upload a PDF or DOCX file.' },
+                { status: 400 }
+            );
         }
 
-        return NextResponse.json({ success: true, text: text.trim() });
+        const trimmed = text.trim();
+        if (!trimmed) {
+            return NextResponse.json(
+                { error: 'The document appears to be empty or could not be read.' },
+                { status: 422 }
+            );
+        }
+
+        return NextResponse.json({ success: true, text: trimmed });
     } catch (error: any) {
         console.error('File extraction error:', error);
-        return NextResponse.json({ error: 'Failed to extract text from file' }, { status: 500 });
+        return NextResponse.json(
+            { error: 'Failed to extract text from the file. Please make sure it is a valid PDF or DOCX.' },
+            { status: 500 }
+        );
     }
 }
