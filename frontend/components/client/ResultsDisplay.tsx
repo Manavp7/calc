@@ -93,16 +93,28 @@ export default function ResultsDisplay() {
         try {
             // Calculate actual internal costs using the pricing engine
             // Use getState() to ensure we have the absolute latest inputs (including just-set lead info)
-            const currentInputs = usePricingStore.getState().inputs;
+            const currentState = usePricingStore.getState();
+            const currentInputs = currentState.inputs;
+            const aiAnalysis = currentState.aiAnalysis;
             const internalCost = calculateInternalCost(currentInputs);
             const profitAnalysis = calculateProfit(clientPrice, internalCost);
 
             const projectData = {
-                clientName: currentInputs.clientName,
+                clientName: currentInputs.clientName || 'Anonymous',
                 companyName: currentInputs.companyName,
                 clientEmail: currentInputs.email,
                 clientPhone: currentInputs.phone,
-                inputs: currentInputs,
+                projectDescription: currentInputs.projectDescription,
+                aiAnalysis: aiAnalysis || undefined,
+                inputs: {
+                    ideaType: currentInputs.ideaType,
+                    productFormat: currentInputs.productFormat,
+                    techStack: currentInputs.techStack,
+                    selectedFeatures: currentInputs.selectedFeatures,
+                    deliverySpeed: currentInputs.deliverySpeed,
+                    supportDuration: currentInputs.supportDuration,
+                    complexityLevel: currentInputs.complexityLevel || 'basic',
+                },
                 clientPrice: {
                     min: clientPrice.priceRange.min,
                     max: clientPrice.priceRange.max,
@@ -132,22 +144,27 @@ export default function ResultsDisplay() {
                 configVersionUsed: 1,
             };
 
+            console.log('💾 Saving project data:', JSON.stringify(projectData, null, 2));
+
             const response = await fetch('/api/projects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(projectData),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const data = await response.json();
-                console.log('Project data saved successfully', data);
+                console.log('✅ Project saved successfully:', data);
                 setIsSaved(true);
                 if (data.id) {
                     setProjectId(data.id);
                 }
+            } else {
+                console.error('❌ Project save failed:', response.status, data);
             }
         } catch (error) {
-            console.error('Error saving project data:', error);
+            console.error('❌ Error saving project data:', error);
         }
     };
 

@@ -229,10 +229,11 @@ const ProjectSchema = new Schema<IProject>({
     inputs: {
         ideaType: { type: String, required: true },
         productFormat: { type: String, required: true },
-        techStack: { type: String },
+        techStack: [{ type: String }],
         selectedFeatures: [{ type: String }],
         deliverySpeed: { type: String, required: true },
         supportDuration: { type: String, required: true },
+        complexityLevel: { type: String },
     },
     clientPrice: {
         min: { type: Number, required: true },
