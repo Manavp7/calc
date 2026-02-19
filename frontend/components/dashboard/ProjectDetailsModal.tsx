@@ -24,6 +24,7 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, viewMode
         if (isOpen && project?.id) {
             fetchProjectDetails();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, project?.id]);
 
     const fetchProjectDetails = async () => {

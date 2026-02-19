@@ -245,7 +245,7 @@ export default function AdminDashboard() {
                     ) : recentProjects.length === 0 ? (
                         <div className="text-center py-12 text-gray-500">
                             <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                            <p>No client submissions yet. They'll appear here automatically.</p>
+                            <p>No client submissions yet. They&apos;ll appear here automatically.</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto">

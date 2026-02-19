@@ -85,6 +85,7 @@ export default function ResultsDisplay() {
         if (showResults && clientPrice && timeline && isUnlocked && !isSaved) {
             saveProjectData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showResults, clientPrice, timeline, isUnlocked, isSaved]);
 
     const saveProjectData = async () => {

@@ -27,6 +27,7 @@ const DebouncedInput = ({
         if (parseFloat(localValue) !== value) {
             setLocalValue(value.toString());
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
