@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db';
 import { Project } from '@/lib/models';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Fetch all projects
 export async function GET(request: NextRequest) {
     try {
