@@ -357,11 +357,9 @@ export default function ResultsDisplay() {
                                 onClick={() => {
                                     const { enableEditMode } = usePricingStore.getState();
                                     enableEditMode();
-                                    // Scroll to project description section
+                                    // Scroll to top so the AI input / first section is visible
                                     setTimeout(() => {
-                                        const targetSection = document.querySelector('#idea-definition') ||
-                                            document.querySelector('section');
-                                        targetSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
                                     }, 100);
                                 }}
                                 className="px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-yellow-500/50 transition-all font-semibold text-gray-300 hover:text-white flex items-center gap-2 mx-auto"

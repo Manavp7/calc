@@ -303,6 +303,6 @@ export const usePricingStore = create<PricingState>((set, get) => ({
     },
 
     enableEditMode: () => {
-        set({ showResults: false });
+        set({ showResults: false, aiMode: false });
     },
 }));
